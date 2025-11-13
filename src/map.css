@@ -1,45 +1,46 @@
-/* minimal, no Tailwind */
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}
+/* -------------------------------------------------------
+   Base layout
+------------------------------------------------------- */
 
 .wrap {
-    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-family: system-ui, sans-serif;
 }
 
 .grid {
     display: grid;
     grid-template-columns: 1fr 340px;
+    gap: 20px;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
     gap: 16px;
 }
 
-@media (max-width: 1000px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
+.side {
+    border-left: 1px solid #ddd;
+    padding-left: 16px;
+    overflow-y: auto;
+    max-height: 80vh;
 }
 
 .h1 {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 8px;
+    font-size: 1.8rem;
+    margin: 0;
 }
 
 .h2 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 8px 0;
+    font-size: 1.4rem;
+    margin: 0 0 10px;
 }
 
 .h3 {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 8px 0;
+    font-size: 1.2rem;
+    margin: 10px 0;
 }
 
 .bold {
@@ -47,130 +48,235 @@ body {
 }
 
 .muted {
-    opacity: .75;
-    padding: 4px 6px;
+    color: #666;
 }
+
+.sr-only {
+    position: absolute !important;
+    left: -9999px !important;
+    top: auto !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.focus-reveal:focus {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin-bottom: 10px;
+    padding: 6px;
+    background: #003366;
+    color: #fff;
+}
+
+/* -------------------------------------------------------
+   Map container
+------------------------------------------------------- */
+
+.mapShell {
+    border: 3px solid #003366;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #eaeaea;
+    outline: none;
+}
+
+.loading {
+    padding: 40px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.popup {
+    max-width: 240px;
+}
+
+.popupTitle {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.popupDesc {
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.popupCoords {
+    font-size: 0.75rem;
+    color: #777;
+}
+
+.popupImg {
+    width: 100%;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+/* -------------------------------------------------------
+   Legend
+------------------------------------------------------- */
+
+.legend {
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+    font-size: 0.95rem;
+}
+
+.legend .dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    margin-right: 4px;
+}
+
+/* -------------------------------------------------------
+   Controls + Search + Buttons
+------------------------------------------------------- */
 
 .controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
-    margin-bottom: 8px;
 }
 
-.search {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 6px 10px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
-}
-
-.search input {
-    border: 0;
-    outline: 0;
-    font-size: 14px;
-}
-
-.btn {
-    background: #fff;
-    border: 1px solid #333;
-    color: #000;
-    border-radius: 12px;
-    padding: 10px 12px;
-    line-height: 1;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+.controls .btn {
+    background: #003366;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: none;
     cursor: pointer;
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
 }
 
-.btn:hover {
-    background: #f9f9f9;
+.controls .btn:hover {
+    background: #002244;
 }
 
-.btn:focus {
-    outline: 2px solid #000;
-    outline-offset: 2px;
-}
-
-.zoomGroup {
+.controls .zoomGroup {
     display: flex;
     gap: 6px;
-    margin-left: auto;
 }
 
 .zoomBtn {
-    width: 44px;
-    height: 44px;
-    font-size: 28px;
-    font-weight: 700;
-    padding: 0;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
-.icon {
-    width: 16px;
-    height: 16px;
+.controls .search {
+    flex: 1 1 220px;
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #003366;
+    border-radius: 6px;
+    padding: 4px 6px;
 }
 
-.mapShell {
-    border-radius: 12px;
+.controls .search input {
+    flex: 1;
+    border: none;
+    padding: 4px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.controls .search .icon {
+    margin-right: 6px;
+    stroke-width: 2;
+}
+
+/* -------------------------------------------------------
+   Directory Panel
+------------------------------------------------------- */
+
+.accordion {
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, .12);
-    background: #f8f8f8;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    margin-bottom: 10px;
 }
 
-.mapShell:focus {
-    outline: 3px solid #000;
-    outline-offset: 4px;
+.accordionHeader {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border: 0;
+    background: #003366;
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
 }
 
-/* visible focus */
-.loading {
-    padding: 16px;
+.accordionHeader:hover {
+    background: #00264d;
 }
 
-.side {
+.accordionHeader:focus {
+    outline: 3px solid #ffbf47;
+    outline-offset: 0;
+}
+
+.accordionPanel {
+    padding: 6px 10px 10px;
     background: #fff;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, .12);
+    border-bottom: 1px solid #eee;
 }
 
-.listScroll {
-    max-height: 65vh;
-    overflow: auto;
+.accordionPanel.isOpen {
+    display: block;
 }
+
+.accordionPanel[hidden] {
+    display: none;
+}
+
+/* -------------------------------------------------------
+   Directory List Items
+------------------------------------------------------- */
 
 .list {
     list-style: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
 }
 
 .listItem {
     width: 100%;
     text-align: left;
-    border: 0;
-    background: transparent;
-    border-radius: 8px;
-    padding: 10px;
+    border: none;
+    background: #fff;
+    padding: 8px 6px;
+    margin-bottom: 3px;
+    border-radius: 4px;
     cursor: pointer;
+    display: block;
 }
 
-.listItem:hover,
+.listItem:hover {
+    background: #e6eef6;
+}
+
 .listItem:focus {
-    background: #f1f1f1;
+    outline: 3px solid #ffbf47;
+    outline-offset: 0;
 }
 
-.listItem:focus {
-    outline: 2px solid #000;
-    outline-offset: 2px;
-}
-
-.isSel {
-    background: #f1f1f1;
+.listItem.isSel {
+    background: #cfe2f3;
+    border-left: 4px solid #003366;
 }
 
 .listName {
@@ -178,124 +284,81 @@ body {
 }
 
 .listCat {
-    font-size: 12px;
-    opacity: .7;
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 2px;
 }
 
-.form .lb {
-    display: block;
-    font-size: 13px;
-    margin-top: 6px;
+/* -------------------------------------------------------
+   Editor Panel (edit mode only)
+------------------------------------------------------- */
+
+.editor {
+    background: #fdfdfd;
+    border: 1px solid #ccc;
+    padding: 12px;
+    margin-top: 16px;
+    border-radius: 8px;
+}
+
+.lb {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
 }
 
 .txt {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #666;
-    border-radius: 8px;
+    padding: 6px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.txt:focus {
+    outline: 3px solid #ffbf47;
+    outline-offset: 0;
+    border-color: #003366;
 }
 
 .help {
-    font-size: 12px;
-    opacity: .75;
-    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #555;
 }
 
-.popupTitle {
-    font-weight: 700;
-}
-
-.popupDesc {
-    font-size: 13px;
-    opacity: .9;
-}
-
-.popupCoords {
-    font-size: 11px;
-    opacity: .6;
-}
-
-/* Legend + mode tag */
-.legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin: 1rem 0;
-    font-size: 0.9rem;
-}
-
-.legend .dot {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: middle;
-}
+/* -------------------------------------------------------
+   Mode Tag
+------------------------------------------------------- */
 
 .modeTag {
-    font-size: 12px;
-    opacity: .7;
-    margin: 6px 0 10px;
-}
-
-/* Popup media/link */
-.popupImg {
-    display: block;
-    max-width: 220px;
-    height: auto;
-    border-radius: 8px;
-    margin: 6px 0;
-}
-
-.linkBtn {
-    display: inline-block;
-    margin-top: 6px;
+    background: #003366;
+    color: #fff;
     padding: 6px 10px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    text-decoration: none;
-    color: #000;
-    background: #fff;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: fit-content;
 }
 
-.linkBtn:focus {
-    outline: 2px solid #000;
-    outline-offset: 2px;
-}
+/* -------------------------------------------------------
+   Hidden File Input
+------------------------------------------------------- */
 
-/* WCAG helpers */
 .hidden {
     display: none;
 }
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
+/* -------------------------------------------------------
+   Responsive
+------------------------------------------------------- */
 
-.focus-reveal:focus {
-    position: static;
-    width: auto;
-    height: auto;
-    margin: 0 0 8px;
-    padding: 6px 10px;
-    background: #000;
-    color: #fff;
-    border-radius: 6px;
-    display: inline-block;
-}
+@media (max-width: 880px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
 
-/* Ensure Leaflet zoom UI has 3:1 contrast if used */
-.leaflet-control-zoom a {
-    color: #000;
-    background: #fff;
-    border: 1px solid #333;
+    .side {
+        max-height: none;
+        border-left: none;
+        padding-left: 0;
+    }
 }

@@ -11,11 +11,37 @@ const isEdit = new URLSearchParams(window.location.search).has("edit");
 
 // Seed data (replace with your exported JSON)
 const INITIAL_FEATURES = [
-  { id: "bldg-g", name: "Building G – Activities Center", xy: [600, 830], desc: "Gymnasium and student activities center. Accessible restrooms at north entrance.", category: "building",
-    url: "/facilities/activities-center", img: "/images/map/building-g.jpg", imgAlt: "Building G entry facing Parking Lot 5" },
-  { id: "bldg-t", name: "Building T – ATEC", xy: [520, 520], desc: "Advanced Technology Education Center.", category: "building" },
-  { id: "riverfront", name: "Riverfront", xy: [310, 240], desc: "Kankakee Riverfront with accessible paths.", category: "landmark" },
-  { id: "parking-5", name: "Parking Lot 5", xy: [760, 620], desc: "Visitor lot with 6 accessible spaces near Building T.", category: "parking" },
+  {
+    id: "bldg-g",
+    name: "Building G – Activities Center",
+    xy: [600, 830],
+    desc: "Gymnasium and student activities center. Accessible restrooms at north entrance.",
+    category: "building",
+    url: "/facilities/activities-center",
+    img: "/images/map/building-g.jpg",
+    imgAlt: "Building G entry facing Parking Lot 5",
+  },
+  {
+    id: "bldg-t",
+    name: "Building T – ATEC",
+    xy: [520, 520],
+    desc: "Advanced Technology Education Center.",
+    category: "building",
+  },
+  {
+    id: "riverfront",
+    name: "Riverfront",
+    xy: [310, 240],
+    desc: "Kankakee Riverfront with accessible paths.",
+    category: "landmark",
+  },
+  {
+    id: "parking-5",
+    name: "Parking Lot 5",
+    xy: [760, 620],
+    desc: "Visitor lot with 6 accessible spaces near Building T.",
+    category: "parking",
+  },
 ];
 
 // ---------- Category Icons (accessible inline SVG) ----------
@@ -50,7 +76,20 @@ function getIcon(category = "building") {
     popupAnchor: [0, -36],
   });
 }
-// ------------------------------------------------------------
+
+// ---------- Directory accordion sections ----------
+const DIRECTORY_SECTIONS = [
+  { id: "buildings", label: "Buildings", categories: ["building"] },
+  { id: "parking", label: "Parking", categories: ["parking"] },
+  { id: "entrances", label: "Accessible Entrances", categories: ["entrance"] },
+  { id: "emergency", label: "Emergency / Safety", categories: ["emergency"] },
+  { id: "assembly", label: "Assembly Points", categories: ["assembly"] },
+  { id: "campus", label: "Campus Locations", categories: ["campus"] },
+  { id: "landmarks", label: "Landmarks", categories: ["landmark"] },
+  { id: "services", label: "Services", categories: ["service"] },
+  { id: "wifi", label: "Outdoor Wi-Fi", categories: ["wifi"] },
+  { id: "other", label: "Other", categories: ["other"] },
+];
 
 function useImageDimensions(src) {
   const [dims, setDims] = useState(null);
@@ -63,7 +102,11 @@ function useImageDimensions(src) {
 }
 
 function Announcer({ message }) {
-  return <div aria-live="polite" aria-atomic="true" className="sr-only">{message}</div>;
+  return (
+    <div aria-live="polite" aria-atomic="true" className="sr-only">
+      {message}
+    </div>
+  );
 }
 
 function FlyTo({ xy, bounds }) {
@@ -76,7 +119,16 @@ function FlyTo({ xy, bounds }) {
   return null;
 }
 
-function Controls({ onAddPoint, filter, setFilter, onExport, onImportClick, onDownloadCSV, onZoomIn, onZoomOut }) {
+function Controls({
+  onAddPoint,
+  filter,
+  setFilter,
+  onExport,
+  onImportClick,
+  onDownloadCSV,
+  onZoomIn,
+  onZoomOut,
+}) {
   return (
     <div className="controls" role="group" aria-label="Map and data controls">
       <label className="search">
@@ -108,8 +160,22 @@ function Controls({ onAddPoint, filter, setFilter, onExport, onImportClick, onDo
       )}
 
       <div className="zoomGroup" role="group" aria-label="Map zoom">
-        <button className="btn zoomBtn" onClick={onZoomIn} aria-label="Zoom in" title="Zoom in">+</button>
-        <button className="btn zoomBtn" onClick={onZoomOut} aria-label="Zoom out" title="Zoom out">−</button>
+        <button
+          className="btn zoomBtn"
+          onClick={onZoomIn}
+          aria-label="Zoom in"
+          title="Zoom in"
+        >
+          +
+        </button>
+        <button
+          className="btn zoomBtn"
+          onClick={onZoomOut}
+          aria-label="Zoom out"
+          title="Zoom out"
+        >
+          −
+        </button>
       </div>
     </div>
   );
@@ -122,16 +188,22 @@ export default function AccessibleCampusMap() {
   const [announce, setAnnounce] = useState("");
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState(null);
+  const [openSections, setOpenSections] = useState(["buildings"]); // default open
 
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
     if (!q) return features;
-    return features.filter(f => `${f.name} ${f.category}`.toLowerCase().includes(q));
+    return features.filter((f) =>
+      `${f.name} ${f.category} ${f.desc || ""}`.toLowerCase().includes(q)
+    );
   }, [features, filter]);
 
   const bounds = useMemo(() => {
     if (!dims) return null;
-    return [[0, 0], [dims.height, dims.width]];
+    return [
+      [0, 0],
+      [dims.height, dims.width],
+    ];
   }, [dims]);
 
   const mapRef = useRef(null);
@@ -148,7 +220,10 @@ export default function AccessibleCampusMap() {
     if (!dims) return;
     const xy = [dims.height / 2, dims.width / 2];
     const id = `pt-${Date.now()}`;
-    setFeatures(prev => [...prev, { id, name: "New point", xy, desc: "", category: "building" }]);
+    setFeatures((prev) => [
+      ...prev,
+      { id, name: "New point", xy, desc: "", category: "building" },
+    ]);
     setSelected(id);
     setAnnounce("Added a new point at map center");
     focusShell();
@@ -161,8 +236,18 @@ export default function AccessibleCampusMap() {
   };
 
   const featuresToCSV = (rows) => {
-    const header = ["id", "name", "category", "desc", "y", "x", "url", "img", "imgAlt"];
-    const body = rows.map(r => [
+    const header = [
+      "id",
+      "name",
+      "category",
+      "desc",
+      "y",
+      "x",
+      "url",
+      "img",
+      "imgAlt",
+    ];
+    const body = rows.map((r) => [
       r.id,
       r.name,
       r.category || "",
@@ -171,24 +256,30 @@ export default function AccessibleCampusMap() {
       Math.round(r.xy[1]),
       r.url || "",
       r.img || "",
-      r.imgAlt || ""
+      r.imgAlt || "",
     ]);
-    const esc = v => `"${String(v).replace(/"/g, '""')}"`;
-    return [header.join(","), ...body.map(a => a.map(esc).join(","))].join("\n");
+    const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
+    return [header.join(","), ...body.map((a) => a.map(esc).join(","))].join("\n");
   };
 
   const downloadCSV = () => {
-    const blob = new Blob([featuresToCSV(features)], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([featuresToCSV(features)], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "kcc-map-points.csv"; a.click();
+    a.href = url;
+    a.download = "kcc-map-points.csv";
+    a.click();
     URL.revokeObjectURL(url);
   };
 
   const parseCSV = (text) => {
     const lines = text.split(/\r?\n/).filter(Boolean);
     if (lines.length < 2) return [];
-    const header = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
+    const header = lines[0]
+      .split(",")
+      .map((h) => h.replace(/"/g, "").trim().toLowerCase());
     const idx = {
       id: header.indexOf("id"),
       name: header.indexOf("name"),
@@ -198,17 +289,23 @@ export default function AccessibleCampusMap() {
       x: header.indexOf("x"),
       url: header.indexOf("url"),
       img: header.indexOf("img"),
-      imgAlt: header.indexOf("imgalt")
+      imgAlt: header.indexOf("imgalt"),
     };
-    return lines.slice(1).map(line => {
-      const cols = line.match(/"([^"]|"")*"|[^,]+/g)?.map(s => s.replace(/^"|"$/g, '').replace(/""/g, '"')) || [];
+    return lines.slice(1).map((line) => {
+      const cols =
+        line
+          .match(/"([^"]|"")*"|[^,]+/g)
+          ?.map((s) => s.replace(/^"|"$/g, "").replace(/""/g, '"')) || [];
       const id = cols[idx.id] || `pt-${crypto.randomUUID?.() || Date.now()}`;
       const name = cols[idx.name] || "Untitled";
       const category = cols[idx.category] || "building";
       const desc = cols[idx.desc] || "";
       const y = parseFloat(cols[idx.y]);
       const x = parseFloat(cols[idx.x]);
-      const xy = (Number.isFinite(y) && Number.isFinite(x)) ? [y, x] : [dims?.height / 2 || 0, dims?.width / 2 || 0];
+      const xy =
+        Number.isFinite(y) && Number.isFinite(x)
+          ? [y, x]
+          : [dims?.height / 2 || 0, dims?.width / 2 || 0];
       const url = idx.url >= 0 ? cols[idx.url] : "";
       const img = idx.img >= 0 ? cols[idx.img] : "";
       const imgAlt = idx.imgAlt >= 0 ? cols[idx.imgAlt] : "";
@@ -238,7 +335,11 @@ export default function AccessibleCampusMap() {
   const onMarkerDrag = (id, e) => {
     if (!isEdit) return;
     const latlng = e.target.getLatLng();
-    setFeatures(prev => prev.map(f => f.id === id ? { ...f, xy: [latlng.lat, latlng.lng] } : f));
+    setFeatures((prev) =>
+      prev.map((f) =>
+        f.id === id ? { ...f, xy: [latlng.lat, latlng.lng] } : f
+      )
+    );
   };
 
   const onSelectList = (f) => {
@@ -249,11 +350,19 @@ export default function AccessibleCampusMap() {
 
   const handleFieldChange = (id, field, value) => {
     if (!isEdit) return;
-    setFeatures(prev => prev.map(f => f.id === id ? { ...f, [field]: value } : f));
+    setFeatures((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, [field]: value } : f))
+    );
   };
 
-  const zoomIn = () => { focusShell(); mapRef.current?.zoomIn(); };
-  const zoomOut = () => { focusShell(); mapRef.current?.zoomOut(); };
+  const zoomIn = () => {
+    focusShell();
+    mapRef.current?.zoomIn();
+  };
+  const zoomOut = () => {
+    focusShell();
+    mapRef.current?.zoomOut();
+  };
 
   // Keyboard navigation: arrows pan, + / - zoom, Home/End reset
   const handleKeyNav = (e) => {
@@ -264,27 +373,63 @@ export default function AccessibleCampusMap() {
     const step = 120 * Math.pow(1.3, map.getZoom() || 0);
 
     switch (key) {
-      case "ArrowUp": e.preventDefault(); map.panBy([0, -step]); break;
-      case "ArrowDown": e.preventDefault(); map.panBy([0,  step]); break;
-      case "ArrowLeft": e.preventDefault(); map.panBy([-step, 0]); break;
-      case "ArrowRight": e.preventDefault(); map.panBy([ step, 0]); break;
-      case "+": case "=": e.preventDefault(); map.zoomIn(); break;
-      case "-": e.preventDefault(); map.zoomOut(); break;
-      case "Home": e.preventDefault(); map.setView(map.getCenter(), 0); break;
-      case "End": e.preventDefault(); bounds && map.fitBounds(bounds); break;
-      default: break;
+      case "ArrowUp":
+        e.preventDefault();
+        map.panBy([0, -step]);
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        map.panBy([0, step]);
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        map.panBy([-step, 0]);
+        break;
+      case "ArrowRight":
+        e.preventDefault();
+        map.panBy([step, 0]);
+        break;
+      case "+":
+      case "=":
+        e.preventDefault();
+        map.zoomIn();
+        break;
+      case "-":
+        e.preventDefault();
+        map.zoomOut();
+        break;
+      case "Home":
+        e.preventDefault();
+        map.setView(map.getCenter(), 0);
+        break;
+      case "End":
+        e.preventDefault();
+        bounds && map.fitBounds(bounds);
+        break;
+      default:
+        break;
     }
   };
   useEffect(() => {
     const listener = (e) => handleKeyNav(e);
     document.addEventListener("keydown", listener);
     return () => document.removeEventListener("keydown", listener);
-  }, [dims]);
+  }, [dims, bounds]);
+
+  const toggleSection = (id) => {
+    setOpenSections((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
 
   return (
     <div className="wrap">
-      <a href="#directory" className="sr-only focus-reveal">Skip to directory</a>
-      <a href="#map-region" className="sr-only focus-reveal">Skip to map</a>
+      <a href="#directory" className="sr-only focus-reveal">
+        Skip to directory
+      </a>
+      <a href="#map-region" className="sr-only focus-reveal">
+        Skip to map
+      </a>
       <Announcer message={announce} />
 
       <div className="grid">
@@ -293,11 +438,26 @@ export default function AccessibleCampusMap() {
 
           {/* Legend */}
           <div className="legend" aria-label="Map legend">
-            <span><span className="dot" style={{background:'#1a237e'}}></span>Building</span>
-            <span><span className="dot" style={{background:'#0d47a1'}}></span>Parking</span>
-            <span><span className="dot" style={{background:'#2e7d32'}}></span>Accessible Entrance</span>
-            <span><span className="dot" style={{background:'#ff6f00'}}></span>Landmark</span>
-            <span><span className="dot" style={{background:'#4e342e'}}></span>Service</span>
+            <span>
+              <span className="dot" style={{ background: "#1a237e" }}></span>
+              Building
+            </span>
+            <span>
+              <span className="dot" style={{ background: "#0d47a1" }}></span>
+              Parking
+            </span>
+            <span>
+              <span className="dot" style={{ background: "#2e7d32" }}></span>
+              Accessible Entrance
+            </span>
+            <span>
+              <span className="dot" style={{ background: "#ff6f00" }}></span>
+              Landmark
+            </span>
+            <span>
+              <span className="dot" style={{ background: "#4e342e" }}></span>
+              Service
+            </span>
           </div>
 
           <Controls
@@ -310,10 +470,19 @@ export default function AccessibleCampusMap() {
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
           />
-          <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={onImportFile} aria-hidden="true" />
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={onImportFile}
+            aria-hidden="true"
+          />
 
           <div className="modeTag">
-            {isEdit ? "Editor mode – unsaved changes; use Export JSON to persist" : "Viewer mode – read-only"}
+            {isEdit
+              ? "Editor mode – unsaved changes; use Export JSON to persist"
+              : "Viewer mode – read-only"}
           </div>
 
           <div
@@ -363,18 +532,33 @@ export default function AccessibleCampusMap() {
                           />
                         )}
                         <div className="popupTitle">{f.name}</div>
-                        {f.desc && <div className="popupDesc">{f.desc}</div>}
+                        {f.desc && (
+                          <div className="popupDesc">{f.desc}</div>
+                        )}
                         {f.url && (
-                          <a className="linkBtn" href={f.url} target="_blank" rel="noopener noreferrer">
-                            More details<span className="sr-only"> about {f.name}</span>
+                          <a
+                            className="linkBtn"
+                            href={f.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            More details
+                            <span className="sr-only"> about {f.name}</span>
                           </a>
                         )}
-                        <div className="popupCoords">[{Math.round(f.xy[0])}, {Math.round(f.xy[1])}]</div>
+                        <div className="popupCoords">
+                          [{Math.round(f.xy[0])}, {Math.round(f.xy[1])}]
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
                 ))}
-                {focusId && <FlyTo xy={features.find(f => f.id === focusId)?.xy} bounds={bounds} />}
+                {focusId && (
+                  <FlyTo
+                    xy={features.find((f) => f.id === focusId)?.xy}
+                    bounds={bounds}
+                  />
+                )}
               </MapContainer>
             ) : (
               <div className="loading">Loading map image…</div>
@@ -382,47 +566,102 @@ export default function AccessibleCampusMap() {
           </div>
 
           <p id="kbd-help" className="muted" aria-live="polite">
-            Keyboard: Tab to directory, Enter to focus item on map. Arrow keys pan; + / − zoom. Home centers; End fits bounds.
+            Keyboard: Tab to directory, Enter to focus item on map. Arrow keys pan; + / −
+            zoom. Home centers; End fits bounds.
           </p>
         </div>
 
         <div id="directory" className="side">
           <h2 className="h2">Directory</h2>
-          <div className="listScroll">
-            <ul className="list">
-              {filtered.map((f) => (
-                <li key={f.id}>
+
+          <div
+            className="accordion"
+            role="navigation"
+            aria-label="Campus locations directory"
+          >
+            {DIRECTORY_SECTIONS.map((section) => {
+              const items = filtered.filter((f) =>
+                section.categories.includes(f.category)
+              );
+              const isOpen = openSections.includes(section.id);
+
+              // If you want to *hide* empty sections, uncomment:
+              // if (!items.length) return null;
+
+              return (
+                <div key={section.id}>
                   <button
-                    className={`listItem ${selected === f.id ? "isSel" : ""}`}
-                    onClick={() => { setSelected(f.id); onSelectList(f); }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setSelected(f.id);
-                        onSelectList(f);
-                      }
-                    }}
-                    aria-label={`Focus ${f.name} on map`}
+                    className="accordionHeader"
+                    onClick={() => toggleSection(section.id)}
+                    aria-expanded={isOpen}
+                    aria-controls={`section-${section.id}`}
                   >
-                    <div className="listName">{f.name}</div>
-                    <div className="listCat">{f.category}</div>
+                    <span>{section.label}</span>
+                    <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
                   </button>
-                </li>
-              ))}
-              {filtered.length === 0 && <li className="muted">No matches</li>}
-            </ul>
+                  <div
+                    id={`section-${section.id}`}
+                    className={`accordionPanel ${isOpen ? "isOpen" : ""}`}
+                    hidden={!isOpen}
+                  >
+                    {items.length ? (
+                      <ul className="list">
+                        {items.map((f) => (
+                          <li key={f.id}>
+                            <button
+                              className={`listItem ${
+                                selected === f.id ? "isSel" : ""
+                              }`}
+                              onClick={() => {
+                                setSelected(f.id);
+                                onSelectList(f);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setSelected(f.id);
+                                  onSelectList(f);
+                                }
+                              }}
+                              aria-label={`Focus ${f.name} on map`}
+                            >
+                              <div className="listName">{f.name}</div>
+                              <div className="listCat">
+                                {f.category || "location"}
+                              </div>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="muted small">
+                        No locations in this category yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {isEdit && selected && (
             <div className="editor">
               <h3 className="h3">Edit selected</h3>
-              <FeatureEditor feature={features.find(f => f.id === selected)} onChange={handleFieldChange} />
+              <FeatureEditor
+                feature={features.find((f) => f.id === selected)}
+                onChange={handleFieldChange}
+              />
             </div>
           )}
 
           <div className="altText">
             <p className="bold">Text alternative (WCAG):</p>
-            <p>Use the directory to focus items on the map. All buildings and landmarks are listed with names and categories. Keyboard: Tab/Shift+Tab to move through the list; Enter to move the map to the selected item.</p>
+            <p>
+              Use the directory accordion to focus items on the map. All buildings and
+              landmarks are listed under their categories with names and descriptions.
+              Keyboard: Tab/Shift+Tab to move through sections and items; Enter to expand
+              a section or move the map to the selected item.
+            </p>
           </div>
         </div>
       </div>
@@ -448,40 +687,90 @@ function FeatureEditor({ feature, onChange }) {
     setImgAlt(feature.imgAlt || "");
   }, [feature.id]);
 
-  useEffect(() => { onChange(feature.id, "name", name); }, [name]);
-  useEffect(() => { onChange(feature.id, "desc", desc); }, [desc]);
-  useEffect(() => { onChange(feature.id, "category", category); }, [category]);
-  useEffect(() => { onChange(feature.id, "url", url); }, [url]);
-  useEffect(() => { onChange(feature.id, "img", img); }, [img]);
-  useEffect(() => { onChange(feature.id, "imgAlt", imgAlt); }, [imgAlt]);
+  useEffect(() => {
+    onChange(feature.id, "name", name);
+  }, [name]);
+  useEffect(() => {
+    onChange(feature.id, "desc", desc);
+  }, [desc]);
+  useEffect(() => {
+    onChange(feature.id, "category", category);
+  }, [category]);
+  useEffect(() => {
+    onChange(feature.id, "url", url);
+  }, [url]);
+  useEffect(() => {
+    onChange(feature.id, "img", img);
+  }, [img]);
+  useEffect(() => {
+    onChange(feature.id, "imgAlt", imgAlt);
+  }, [imgAlt]);
 
   return (
     <div className="form">
-      <label className="lb">Name
-        <input className="txt" value={name} onChange={(e) => setName(e.target.value)} />
+      <label className="lb">
+        Name
+        <input
+          className="txt"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </label>
-      <label className="lb">Description
-        <textarea className="txt" rows={2} value={desc} onChange={(e) => setDesc(e.target.value)} />
+      <label className="lb">
+        Description
+        <textarea
+          className="txt"
+          rows={2}
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
       </label>
-      <label className="lb">Category
-        <select className="txt" value={category} onChange={(e) => setCategory(e.target.value)}>
+      <label className="lb">
+        Category
+        <select
+          className="txt"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
           <option value="building">Building</option>
           <option value="parking">Parking</option>
           <option value="entrance">Accessible Entrance</option>
           <option value="landmark">Landmark</option>
           <option value="service">Service</option>
+          <option value="emergency">Emergency / Safety</option>
+          <option value="assembly">Assembly Point</option>
+          <option value="campus">Campus Location</option>
+          <option value="wifi">Outdoor Wi-Fi</option>
+          <option value="other">Other</option>
         </select>
       </label>
-      <label className="lb">Facility page URL
-        <input className="txt" value={url} onChange={(e) => setUrl(e.target.value)} />
+      <label className="lb">
+        Facility page URL
+        <input
+          className="txt"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+        />
       </label>
-      <label className="lb">Image URL
-        <input className="txt" value={img} onChange={(e) => setImg(e.target.value)} />
+      <label className="lb">
+        Image URL
+        <input
+          className="txt"
+          value={img}
+          onChange={(e) => setImg(e.target.value)}
+        />
       </label>
-      <label className="lb">Image alt text
-        <input className="txt" value={imgAlt} onChange={(e) => setImgAlt(e.target.value)} />
+      <label className="lb">
+        Image alt text
+        <input
+          className="txt"
+          value={imgAlt}
+          onChange={(e) => setImgAlt(e.target.value)}
+        />
       </label>
-      <div className="help">Drag the marker on the map to reposition. Coordinates are saved automatically.</div>
+      <div className="help">
+        Drag the marker on the map to reposition. Coordinates are saved automatically.
+      </div>
     </div>
   );
 }
