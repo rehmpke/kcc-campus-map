@@ -11,10 +11,11 @@ const isEdit = new URLSearchParams(window.location.search).has("edit");
 
 // Seed data (replace with your exported JSON)
 const INITIAL_FEATURES = [
-  { id: "bldg-g", name: "Building G – Activities Center", xy: [600, 830], desc: "Gym / Student Activities", category: "building" },
-  { id: "bldg-t", name: "Building T – ATEC", xy: [520, 520], desc: "Advanced Technology Education Center", category: "building" },
-  { id: "riverfront", name: "Riverfront", xy: [310, 240], desc: "Kankakee Riverfront", category: "landmark" },
-  { id: "parking-5", name: "Parking Lot 5", xy: [760, 620], desc: "Visitor & Staff Parking", category: "parking" },
+  { id: "bldg-g", name: "Building G – Activities Center", xy: [600, 830], desc: "Gymnasium and student activities center. Accessible restrooms at north entrance.", category: "building",
+    url: "/facilities/activities-center", img: "/images/map/building-g.jpg", imgAlt: "Building G entry facing Parking Lot 5" },
+  { id: "bldg-t", name: "Building T – ATEC", xy: [520, 520], desc: "Advanced Technology Education Center.", category: "building" },
+  { id: "riverfront", name: "Riverfront", xy: [310, 240], desc: "Kankakee Riverfront with accessible paths.", category: "landmark" },
+  { id: "parking-5", name: "Parking Lot 5", xy: [760, 620], desc: "Visitor lot with 6 accessible spaces near Building T.", category: "parking" },
 ];
 
 // ---------- Category Icons (accessible inline SVG) ----------
@@ -160,14 +161,17 @@ export default function AccessibleCampusMap() {
   };
 
   const featuresToCSV = (rows) => {
-    const header = ["id", "name", "category", "desc", "y", "x"];
+    const header = ["id", "name", "category", "desc", "y", "x", "url", "img", "imgAlt"];
     const body = rows.map(r => [
       r.id,
       r.name,
       r.category || "",
       String(r.desc || "").replace(/\r?\n/g, " "),
       Math.round(r.xy[0]),
-      Math.round(r.xy[1])
+      Math.round(r.xy[1]),
+      r.url || "",
+      r.img || "",
+      r.imgAlt || ""
     ]);
     const esc = v => `"${String(v).replace(/"/g, '""')}"`;
     return [header.join(","), ...body.map(a => a.map(esc).join(","))].join("\n");
@@ -185,7 +189,17 @@ export default function AccessibleCampusMap() {
     const lines = text.split(/\r?\n/).filter(Boolean);
     if (lines.length < 2) return [];
     const header = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
-    const idx = { id: header.indexOf("id"), name: header.indexOf("name"), category: header.indexOf("category"), desc: header.indexOf("desc"), y: header.indexOf("y"), x: header.indexOf("x") };
+    const idx = {
+      id: header.indexOf("id"),
+      name: header.indexOf("name"),
+      category: header.indexOf("category"),
+      desc: header.indexOf("desc"),
+      y: header.indexOf("y"),
+      x: header.indexOf("x"),
+      url: header.indexOf("url"),
+      img: header.indexOf("img"),
+      imgAlt: header.indexOf("imgalt")
+    };
     return lines.slice(1).map(line => {
       const cols = line.match(/"([^"]|"")*"|[^,]+/g)?.map(s => s.replace(/^"|"$/g, '').replace(/""/g, '"')) || [];
       const id = cols[idx.id] || `pt-${crypto.randomUUID?.() || Date.now()}`;
@@ -195,7 +209,10 @@ export default function AccessibleCampusMap() {
       const y = parseFloat(cols[idx.y]);
       const x = parseFloat(cols[idx.x]);
       const xy = (Number.isFinite(y) && Number.isFinite(x)) ? [y, x] : [dims?.height / 2 || 0, dims?.width / 2 || 0];
-      return { id, name, category, desc, xy };
+      const url = idx.url >= 0 ? cols[idx.url] : "";
+      const img = idx.img >= 0 ? cols[idx.img] : "";
+      const imgAlt = idx.imgAlt >= 0 ? cols[idx.imgAlt] : "";
+      return { id, name, category, desc, xy, url, img, imgAlt };
     });
   };
 
@@ -335,8 +352,23 @@ export default function AccessibleCampusMap() {
                   >
                     <Popup>
                       <div className="popup">
+                        {f.img && (
+                          <img
+                            src={f.img}
+                            alt={f.imgAlt || `${f.name} photo`}
+                            className="popupImg"
+                            width="220"
+                            height="124"
+                            loading="lazy"
+                          />
+                        )}
                         <div className="popupTitle">{f.name}</div>
                         {f.desc && <div className="popupDesc">{f.desc}</div>}
+                        {f.url && (
+                          <a className="linkBtn" href={f.url} target="_blank" rel="noopener noreferrer">
+                            More details<span className="sr-only"> about {f.name}</span>
+                          </a>
+                        )}
                         <div className="popupCoords">[{Math.round(f.xy[0])}, {Math.round(f.xy[1])}]</div>
                       </div>
                     </Popup>
@@ -403,11 +435,25 @@ function FeatureEditor({ feature, onChange }) {
   const [name, setName] = useState(feature.name);
   const [desc, setDesc] = useState(feature.desc || "");
   const [category, setCategory] = useState(feature.category || "building");
+  const [url, setUrl] = useState(feature.url || "");
+  const [img, setImg] = useState(feature.img || "");
+  const [imgAlt, setImgAlt] = useState(feature.imgAlt || "");
 
-  useEffect(() => { setName(feature.name); setDesc(feature.desc || ""); setCategory(feature.category || "building"); }, [feature.id]);
+  useEffect(() => {
+    setName(feature.name);
+    setDesc(feature.desc || "");
+    setCategory(feature.category || "building");
+    setUrl(feature.url || "");
+    setImg(feature.img || "");
+    setImgAlt(feature.imgAlt || "");
+  }, [feature.id]);
+
   useEffect(() => { onChange(feature.id, "name", name); }, [name]);
   useEffect(() => { onChange(feature.id, "desc", desc); }, [desc]);
   useEffect(() => { onChange(feature.id, "category", category); }, [category]);
+  useEffect(() => { onChange(feature.id, "url", url); }, [url]);
+  useEffect(() => { onChange(feature.id, "img", img); }, [img]);
+  useEffect(() => { onChange(feature.id, "imgAlt", imgAlt); }, [imgAlt]);
 
   return (
     <div className="form">
@@ -425,6 +471,15 @@ function FeatureEditor({ feature, onChange }) {
           <option value="landmark">Landmark</option>
           <option value="service">Service</option>
         </select>
+      </label>
+      <label className="lb">Facility page URL
+        <input className="txt" value={url} onChange={(e) => setUrl(e.target.value)} />
+      </label>
+      <label className="lb">Image URL
+        <input className="txt" value={img} onChange={(e) => setImg(e.target.value)} />
+      </label>
+      <label className="lb">Image alt text
+        <input className="txt" value={imgAlt} onChange={(e) => setImgAlt(e.target.value)} />
       </label>
       <div className="help">Drag the marker on the map to reposition. Coordinates are saved automatically.</div>
     </div>
