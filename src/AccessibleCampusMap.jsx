@@ -12,39 +12,97 @@ const isEdit = new URLSearchParams(window.location.search).has("edit");
 // Seed data (replace with your exported JSON)
 const INITIAL_FEATURES = [
   {
-    id: "bldg-g",
-    name: "Building G – Activities Center",
-    glyph: "G",
-    xy: [600, 830],
-    desc: "Gymnasium and student activities center. Accessible restrooms at north entrance.",
-    category: "building",
-    url: "/facilities/activities-center",
-    img: "/images/map/building-g.jpg",
-    imgAlt: "Building G entry facing Parking Lot 5",
+    "id": "bldg-g",
+    "name": "Building G – Activities Center",
+    "glyph": "G",
+    "xy": [
+      1015.605204985727,
+      1469.8784305005684
+    ],
+    "desc": "Gymnasium and student activities center. Accessible restrooms at north entrance.",
+    "category": "entrance",
+    "url": "/facilities/activities-center",
+    "img": "/images/map/building-g.jpg",
+    "imgAlt": "Building G entry facing Parking Lot 5"
   },
   {
-    id: "bldg-t",
-    name: "Building T – ATEC",
-    glyph: "T",
-    xy: [520, 520],
-    desc: "Advanced Technology Education Center.",
-    category: "building",
+    "id": "bldg-t",
+    "name": "Building T – ATEC",
+    "glyph": "T",
+    "xy": [
+      856.1241775669636,
+      1165.2379263025714
+    ],
+    "desc": "Advanced Technology Education Center.",
+    "category": "building"
   },
   {
-    id: "riverfront",
-    name: "Riverfront",
-    glyph: "R",
-    xy: [310, 240],
-    desc: "Kankakee Riverfront with accessible paths.",
-    category: "landmark",
+    "id": "riverfront",
+    "name": "Riverfront",
+    "glyph": "R",
+    "xy": [
+      960.6515954334849,
+      1274.8286616268279
+    ],
+    "desc": "Kankakee Riverfront with accessible paths.",
+    "category": "landmark"
   },
   {
-    id: "parking-5",
-    name: "Parking Lot 5",
-    xy: [760, 620],
-    desc: "Visitor lot with 6 accessible spaces near Building T.",
-    category: "parking",
+    "id": "parking-5",
+    "name": "Parking Lot 5",
+    "xy": [
+      703.9823289686334,
+      1174.9482376994472
+    ],
+    "desc": "Visitor lot with 6 accessible spaces near Building T.",
+    "category": "parking"
   },
+  {
+    "id": "pt-1763069975175",
+    "name": "Building V – Technology",
+    "xy": [
+      944.6481909768765,
+      1022.4768116077321
+    ],
+    "desc": "",
+    "category": "building",
+    "url": "",
+    "img": "",
+    "imgAlt": "",
+    "glyph": ""
+  },
+  {
+    "id": "pt-1763070064102",
+    "name": "Building L",
+    "xy": [
+      1216.0922236366691,
+      1165.2713741969803
+    ],
+    "desc": "",
+    "category": "building"
+  },
+  {
+    "id": "pt-1763070140472",
+    "name": "Building R – Arts & Sciences",
+    "xy": [
+      1194.8856585851227,
+      951.7864340883023
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "R"
+  },
+  {
+    "id": "pt-1763070268994",
+    "name": "Building D – WDC",
+    "xy": [
+      944.6481909768765,
+      1367.4458539025493
+    ],
+    "desc": "Workforce Development Center",
+    "category": "building",
+    "glyph": "D"
+  }
 ];
 
 // ---------- Category Icons (large circular markers with standard wheelchair) ----------
