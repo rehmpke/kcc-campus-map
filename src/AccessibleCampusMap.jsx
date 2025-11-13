@@ -14,6 +14,7 @@ const INITIAL_FEATURES = [
   {
     id: "bldg-g",
     name: "Building G – Activities Center",
+    glyph: "G",
     xy: [600, 830],
     desc: "Gymnasium and student activities center. Accessible restrooms at north entrance.",
     category: "building",
@@ -24,6 +25,7 @@ const INITIAL_FEATURES = [
   {
     id: "bldg-t",
     name: "Building T – ATEC",
+    glyph: "T",
     xy: [520, 520],
     desc: "Advanced Technology Education Center.",
     category: "building",
@@ -31,6 +33,7 @@ const INITIAL_FEATURES = [
   {
     id: "riverfront",
     name: "Riverfront",
+    glyph: "R",
     xy: [310, 240],
     desc: "Kankakee Riverfront with accessible paths.",
     category: "landmark",
@@ -44,36 +47,66 @@ const INITIAL_FEATURES = [
   },
 ];
 
-// ---------- Category Icons (accessible inline SVG) ----------
-const ICONS = {
-  building: `<svg xmlns='http://www.w3.org/2000/svg' width='26' height='38' viewBox='0 0 26 38' aria-hidden='true' focusable='false'>
-    <path d='M13 0C5.82 0 0 5.82 0 13c0 9.34 13 25 13 25s13-15.66 13-25C26 5.82 20.18 0 13 0z' fill='#1a237e'/>
-    <rect x='8' y='8' width='10' height='10' fill='white'/>
-  </svg>`,
-  parking: `<svg xmlns='http://www.w3.org/2000/svg' width='26' height='38' viewBox='0 0 26 38' aria-hidden='true' focusable='false'>
-    <path d='M13 0C5.82 0 0 5.82 0 13c0 9.34 13 25 13 25s13-15.66 13-25C26 5.82 20.18 0 13 0z' fill='#0d47a1'/>
-    <text x='13' y='17' font-size='10' fill='white' text-anchor='middle' font-family='Arial' font-weight='bold'>P</text>
-  </svg>`,
-  entrance: `<svg xmlns='http://www.w3.org/2000/svg' width='26' height='38' viewBox='0 0 26 38' aria-hidden='true' focusable='false'>
-    <path d='M13 0C5.82 0 0 5.82 0 13c0 9.34 13 25 13 25s13-15.66 13-25C26 5.82 20.18 0 13 0z' fill='#2e7d32'/>
-    <text x='13' y='17' font-size='12' fill='white' text-anchor='middle' font-family='Arial'>♿</text>
-  </svg>`,
-  landmark: `<svg xmlns='http://www.w3.org/2000/svg' width='26' height='38' viewBox='0 0 26 38' aria-hidden='true' focusable='false'>
-    <path d='M13 0C5.82 0 0 5.82 0 13c0 9.34 13 25 13 25s13-15.66 13-25C26 5.82 20.18 0 13 0z' fill='#ff6f00'/>
-    <circle cx='13' cy='13' r='4' fill='white'/>
-  </svg>`,
-  service: `<svg xmlns='http://www.w3.org/2000/svg' width='26' height='38' viewBox='0 0 26 38' aria-hidden='true' focusable='false'>
-    <path d='M13 0C5.82 0 0 5.82 0 13c0 9.34 13 25 13 25s13-15.66 13-25C26 5.82 20.18 0 13 0z' fill='#4e342e'/>
-    <rect x='10' y='8' width='6' height='10' fill='white'/>
-  </svg>`,
+// ---------- Category Icons (large circular markers with standard wheelchair) ----------
+
+// Base visual for each category.
+const CATEGORY_STYLES = {
+  building: { color: "#004b87", glyph: "B" }, // buildings
+  parking: { color: "#00695c", glyph: "P" },
+  entrance: { color: "#0079c1", glyph: "♿" }, // standard accessibility icon
+  landmark: { color: "#ff6f00", glyph: "L" },
+  service: { color: "#6d4c41", glyph: "S" },
+  emergency: { color: "#b71c1c", glyph: "E" },
+  assembly: { color: "#33691e", glyph: "A" },
+  campus: { color: "#283593", glyph: "C" },
+  wifi: { color: "#1e88e5", glyph: "W" },
+  other: { color: "#424242", glyph: "•" },
 };
-function getIcon(category = "building") {
-  const svg = ICONS[category] || ICONS.building;
+
+// Optional per-feature override: if a feature has `glyph`, use that.
+function getGlyphForFeature(feature) {
+  if (feature && feature.glyph) return feature.glyph;
+
+  if (feature && feature.category && CATEGORY_STYLES[feature.category]) {
+    return CATEGORY_STYLES[feature.category].glyph;
+  }
+
+  // Fallback: first letter of name or dot
+  const c = feature?.name?.trim()?.[0];
+  return c ? c.toUpperCase() : "•";
+}
+
+function makeMarkerSvg(bgColor, glyphText) {
+  return `
+    <svg xmlns='http://www.w3.org/2000/svg'
+         width='44' height='44' viewBox='0 0 44 44'
+         aria-hidden='true' focusable='false'>
+      <!-- outer halo to preserve contrast over any background -->
+      <circle cx='22' cy='22' r='20' fill='white'/>
+      <circle cx='22' cy='22' r='18' fill='${bgColor}'/>
+      <text x='22' y='27'
+        text-anchor='middle'
+        font-family='Arial, sans-serif'
+        font-weight='700'
+        font-size='18'
+        fill='white'>
+        ${glyphText}
+      </text>
+    </svg>
+  `;
+}
+
+// Leaflet icon factory – pass category and the feature
+function getIcon(category = "building", feature = null) {
+  const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.building;
+  const glyph = getGlyphForFeature(feature || { category, name: "" });
+  const svg = makeMarkerSvg(style.color, glyph);
+
   return new L.Icon({
     iconUrl: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    iconSize: [26, 38],
-    iconAnchor: [13, 38],
-    popupAnchor: [0, -36],
+    iconSize: [44, 44],
+    iconAnchor: [22, 44],
+    popupAnchor: [0, -32],
   });
 }
 
@@ -246,6 +279,7 @@ export default function AccessibleCampusMap() {
       "url",
       "img",
       "imgAlt",
+      "glyph",
     ];
     const body = rows.map((r) => [
       r.id,
@@ -257,6 +291,7 @@ export default function AccessibleCampusMap() {
       r.url || "",
       r.img || "",
       r.imgAlt || "",
+      r.glyph || "",
     ]);
     const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
     return [header.join(","), ...body.map((a) => a.map(esc).join(","))].join("\n");
@@ -290,6 +325,7 @@ export default function AccessibleCampusMap() {
       url: header.indexOf("url"),
       img: header.indexOf("img"),
       imgAlt: header.indexOf("imgalt"),
+      glyph: header.indexOf("glyph"),
     };
     return lines.slice(1).map((line) => {
       const cols =
@@ -309,7 +345,8 @@ export default function AccessibleCampusMap() {
       const url = idx.url >= 0 ? cols[idx.url] : "";
       const img = idx.img >= 0 ? cols[idx.img] : "";
       const imgAlt = idx.imgAlt >= 0 ? cols[idx.imgAlt] : "";
-      return { id, name, category, desc, xy, url, img, imgAlt };
+      const glyph = idx.glyph >= 0 ? cols[idx.glyph] : "";
+      return { id, name, category, desc, xy, url, img, imgAlt, glyph };
     });
   };
 
@@ -424,10 +461,10 @@ export default function AccessibleCampusMap() {
 
   return (
     <div className="wrap">
-      <a href="#directory" className="sr-only focus-reveal">
+      <a href="#directory" className="focus-reveal">
         Skip to directory
       </a>
-      <a href="#map-region" className="sr-only focus-reveal">
+      <a href="#map-region" className="focus-reveal">
         Skip to map
       </a>
       <Announcer message={announce} />
@@ -439,15 +476,15 @@ export default function AccessibleCampusMap() {
           {/* Legend */}
           <div className="legend" aria-label="Map legend">
             <span>
-              <span className="dot" style={{ background: "#1a237e" }}></span>
+              <span className="dot" style={{ background: "#004b87" }}></span>
               Building
             </span>
             <span>
-              <span className="dot" style={{ background: "#0d47a1" }}></span>
+              <span className="dot" style={{ background: "#00695c" }}></span>
               Parking
             </span>
             <span>
-              <span className="dot" style={{ background: "#2e7d32" }}></span>
+              <span className="dot" style={{ background: "#0079c1" }}></span>
               Accessible Entrance
             </span>
             <span>
@@ -455,7 +492,7 @@ export default function AccessibleCampusMap() {
               Landmark
             </span>
             <span>
-              <span className="dot" style={{ background: "#4e342e" }}></span>
+              <span className="dot" style={{ background: "#6d4c41" }}></span>
               Service
             </span>
           </div>
@@ -514,7 +551,7 @@ export default function AccessibleCampusMap() {
                   <Marker
                     key={f.id}
                     position={f.xy}
-                    icon={getIcon(f.category)}
+                    icon={getIcon(f.category, f)}
                     draggable={isEdit}
                     eventHandlers={{ dragend: (e) => onMarkerDrag(f.id, e) }}
                     title={f.name}
@@ -584,9 +621,6 @@ export default function AccessibleCampusMap() {
                 section.categories.includes(f.category)
               );
               const isOpen = openSections.includes(section.id);
-
-              // If you want to *hide* empty sections, uncomment:
-              // if (!items.length) return null;
 
               return (
                 <div key={section.id}>
@@ -677,6 +711,7 @@ function FeatureEditor({ feature, onChange }) {
   const [url, setUrl] = useState(feature.url || "");
   const [img, setImg] = useState(feature.img || "");
   const [imgAlt, setImgAlt] = useState(feature.imgAlt || "");
+  const [glyph, setGlyph] = useState(feature.glyph || "");
 
   useEffect(() => {
     setName(feature.name);
@@ -685,6 +720,7 @@ function FeatureEditor({ feature, onChange }) {
     setUrl(feature.url || "");
     setImg(feature.img || "");
     setImgAlt(feature.imgAlt || "");
+    setGlyph(feature.glyph || "");
   }, [feature.id]);
 
   useEffect(() => {
@@ -705,6 +741,9 @@ function FeatureEditor({ feature, onChange }) {
   useEffect(() => {
     onChange(feature.id, "imgAlt", imgAlt);
   }, [imgAlt]);
+  useEffect(() => {
+    onChange(feature.id, "glyph", glyph);
+  }, [glyph]);
 
   return (
     <div className="form">
@@ -743,6 +782,14 @@ function FeatureEditor({ feature, onChange }) {
           <option value="wifi">Outdoor Wi-Fi</option>
           <option value="other">Other</option>
         </select>
+      </label>
+      <label className="lb">
+        Marker glyph (optional – letter/number)
+        <input
+          className="txt"
+          value={glyph}
+          onChange={(e) => setGlyph(e.target.value)}
+        />
       </label>
       <label className="lb">
         Facility page URL
