@@ -16,8 +16,8 @@ const INITIAL_FEATURES = [
     "name": "Building G – Activities Center",
     "glyph": "G",
     "xy": [
-      1015.605204985727,
-      1469.8784305005684
+      1038.7249795479927,
+      1455.223528045635
     ],
     "desc": "Gymnasium and student activities center. Accessible restrooms at north entrance.",
     "category": "entrance",
@@ -30,19 +30,19 @@ const INITIAL_FEATURES = [
     "name": "Building T – ATEC",
     "glyph": "T",
     "xy": [
-      856.1241775669636,
-      1165.2379263025714
+      886.003469149934,
+      1151.8783675948316
     ],
     "desc": "Advanced Technology Education Center.",
     "category": "building"
   },
   {
     "id": "riverfront",
-    "name": "Riverfront",
-    "glyph": "R",
+    "name": "Riverfront Campus",
+    "glyph": "RC",
     "xy": [
-      960.6515954334849,
-      1274.8286616268279
+      1192.3184882251576,
+      1575.7534551964682
     ],
     "desc": "Kankakee Riverfront with accessible paths.",
     "category": "landmark"
@@ -51,11 +51,12 @@ const INITIAL_FEATURES = [
     "id": "parking-5",
     "name": "Parking Lot 5",
     "xy": [
-      703.9823289686334,
-      1174.9482376994472
+      673.1602440477584,
+      1139.8561312727145
     ],
-    "desc": "Visitor lot with 6 accessible spaces near Building T.",
-    "category": "parking"
+    "desc": "Visitor lot with 6 accessible spaces near Building T. Open Parking",
+    "category": "parking",
+    "glyph": "P5"
   },
   {
     "id": "pt-1763069975175",
@@ -69,7 +70,7 @@ const INITIAL_FEATURES = [
     "url": "",
     "img": "",
     "imgAlt": "",
-    "glyph": ""
+    "glyph": "V"
   },
   {
     "id": "pt-1763070064102",
@@ -79,14 +80,15 @@ const INITIAL_FEATURES = [
       1165.2713741969803
     ],
     "desc": "",
-    "category": "building"
+    "category": "building",
+    "glyph": "L"
   },
   {
     "id": "pt-1763070140472",
     "name": "Building R – Arts & Sciences",
     "xy": [
-      1194.8856585851227,
-      951.7864340883023
+      1216.921300048837,
+      1081.8921510069179
     ],
     "desc": "",
     "category": "building",
@@ -102,6 +104,254 @@ const INITIAL_FEATURES = [
     "desc": "Workforce Development Center",
     "category": "building",
     "glyph": "D"
+  },
+  {
+    "id": "pt-1763071079282",
+    "name": "Parking Lot 13",
+    "xy": [
+      845.6970044781933,
+      848.528137423857
+    ],
+    "desc": "Staff Parking lot",
+    "category": "parking",
+    "glyph": "P13"
+  },
+  {
+    "id": "pt-1763071338295",
+    "name": "Parking Lot 8",
+    "xy": [
+      1125.0019281961152,
+      925.6026704952725
+    ],
+    "desc": "Circle Drive by R and M building",
+    "category": "parking",
+    "glyph": "P8"
+  },
+  {
+    "id": "pt-1763071429919",
+    "name": "Parking Lot 7",
+    "xy": [
+      1048.634395827968,
+      1062.0743853421943
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P7"
+  },
+  {
+    "id": "pt-1763071463190",
+    "name": "Building W",
+    "xy": [
+      1031.6521078555156,
+      1198.5444029424268
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "W"
+  },
+  {
+    "id": "pt-1763071535071",
+    "name": "Building M – Health Careers Center For Excelence",
+    "xy": [
+      1127.1074645843232,
+      1205.6170619230634
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "M"
+  },
+  {
+    "id": "pt-1763071843209",
+    "name": "Parking Lot 6",
+    "xy": [
+      763.6712649500953,
+      994.1921343482858
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P6"
+  },
+  {
+    "id": "pt-1763072015459",
+    "name": "West Campus",
+    "xy": [
+      1042.6341896618696,
+      373.54486448851696
+    ],
+    "desc": "",
+    "category": "landmark",
+    "glyph": "WC"
+  },
+  {
+    "id": "pt-1763072112804",
+    "name": "Parking Lot 14",
+    "xy": [
+      893.7865791810192,
+      210.71760863775486
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P14"
+  },
+  {
+    "id": "pt-1763072316063",
+    "name": "Prairie Acre",
+    "xy": [
+      1064.1663926258154,
+      149.9058950661214
+    ],
+    "desc": "",
+    "category": "landmark",
+    "glyph": "PA"
+  },
+  {
+    "id": "pt-1763072485335",
+    "name": "Green House",
+    "xy": [
+      547.5820948414481,
+      465.5724447105801
+    ],
+    "desc": "",
+    "category": "building",
+    "url": "",
+    "img": "",
+    "imgAlt": "",
+    "glyph": "GH"
+  },
+  {
+    "id": "pt-1763072531800",
+    "name": "Parking Lot 11",
+    "xy": [
+      770.9955356232549,
+      355
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P11"
+  },
+  {
+    "id": "pt-1763072564256",
+    "name": "Parking Lot 10",
+    "xy": [
+      713.9948978551483,
+      456.000300033661
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P10"
+  },
+  {
+    "id": "pt-1763072771898",
+    "name": "Parking Lot 4",
+    "xy": [
+      460.99298455082896,
+      1048.9996999663392
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P4"
+  },
+  {
+    "id": "pt-1763072796818",
+    "name": "Parking Lot 12",
+    "xy": [
+      712.7699490181803,
+      239.00209204105306
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P12"
+  },
+  {
+    "id": "pt-1763072852899",
+    "name": "Building 5",
+    "xy": [
+      596.7764767541069,
+      249.25492821242187
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "5"
+  },
+  {
+    "id": "pt-1763072892251",
+    "name": "Building 4",
+    "xy": [
+      449.4422406003043,
+      242.59804813192954
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "4"
+  },
+  {
+    "id": "pt-1763072937355",
+    "name": "Building A",
+    "xy": [
+      722.2932843642988,
+      322.89810524960245
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "A"
+  },
+  {
+    "id": "pt-1763072989292",
+    "name": "Golf Course",
+    "xy": [
+      128.20904153203196,
+      408.17684979772935
+    ],
+    "desc": "",
+    "category": "landmark",
+    "glyph": "GC"
+  },
+  {
+    "id": "pt-1763222088162",
+    "name": "Building VA",
+    "xy": [
+      593.28694180377,
+      458.1897068328429
+    ],
+    "desc": "",
+    "category": "building",
+    "url": "",
+    "img": "",
+    "imgAlt": "",
+    "glyph": "VA"
+  },
+  {
+    "id": "pt-1763222202968",
+    "name": "P9",
+    "xy": [
+      256.4717977616396,
+      950.2128230880825
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P9"
+  },
+  {
+    "id": "pt-1763222289152",
+    "name": "PM",
+    "xy": [
+      847.1094141599549,
+      1364.7160876900366
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "PM"
+  },
+  {
+    "id": "pt-1763222541246",
+    "name": "P1",
+    "xy": [
+      847.081454010475,
+      1523.8901105450932
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P1"
   }
 ];
 
