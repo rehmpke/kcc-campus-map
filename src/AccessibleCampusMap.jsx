@@ -275,11 +275,10 @@ const INITIAL_FEATURES = [
 
 // ---------- Category Icons (large circular markers with standard wheelchair) ----------
 
-// Base visual for each category.
 const CATEGORY_STYLES = {
-  building: { color: "#004b87", glyph: "B" }, // buildings
+  building: { color: "#004b87", glyph: "B" },
   parking: { color: "#00695c", glyph: "P" },
-  entrance: { color: "#0079c1", glyph: "♿" }, // standard accessibility icon
+  entrance: { color: "#0079c1", glyph: "♿" },
   landmark: { color: "#ff6f00", glyph: "L" },
   service: { color: "#6d4c41", glyph: "S" },
   emergency: { color: "#b71c1c", glyph: "E" },
@@ -289,7 +288,6 @@ const CATEGORY_STYLES = {
   other: { color: "#424242", glyph: "•" },
 };
 
-// Optional per-feature override: if a feature has `glyph`, use that.
 function getGlyphForFeature(feature) {
   if (feature && feature.glyph) return feature.glyph;
 
@@ -297,7 +295,6 @@ function getGlyphForFeature(feature) {
     return CATEGORY_STYLES[feature.category].glyph;
   }
 
-  // Fallback: first letter of name or dot
   const c = feature?.name?.trim()?.[0];
   return c ? c.toUpperCase() : "•";
 }
@@ -307,7 +304,6 @@ function makeMarkerSvg(bgColor, glyphText) {
     <svg xmlns='http://www.w3.org/2000/svg'
          width='44' height='44' viewBox='0 0 44 44'
          aria-hidden='true' focusable='false'>
-      <!-- outer halo to preserve contrast over any background -->
       <circle cx='22' cy='22' r='20' fill='white'/>
       <circle cx='22' cy='22' r='18' fill='${bgColor}'/>
       <text x='22' y='27'
@@ -322,7 +318,6 @@ function makeMarkerSvg(bgColor, glyphText) {
   `;
 }
 
-// Leaflet icon factory – pass category and the feature
 function getIcon(category = "building", feature = null) {
   const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.building;
   const glyph = getGlyphForFeature(feature || { category, name: "" });
@@ -369,13 +364,48 @@ function Announcer({ message }) {
   );
 }
 
-function FlyTo({ xy, bounds }) {
+function DirectoryFlyTo({ action, markerRefs, openPopupIdRef, setSelected }) {
   const map = useMap();
+
   useEffect(() => {
-    if (!xy || !bounds) return;
-    const [y, x] = xy;
-    map.flyTo(L.latLng(y, x), 0, { duration: 0.4 });
-  }, [xy, bounds, map]);
+    if (!action?.xy) return;
+
+    const [y, x] = action.xy;
+    const latlng = L.latLng(y, x);
+
+    const closeCurrentPopup = () => {
+      const openId = openPopupIdRef.current;
+      const currentMarker = openId ? markerRefs.current[openId] : null;
+
+      if (currentMarker?.closePopup) currentMarker.closePopup();
+      map.closePopup();
+      openPopupIdRef.current = null;
+    };
+
+    const openNextPopup = () => {
+      const marker = markerRefs.current[action.id];
+      if (!marker?.openPopup) return;
+
+      closeCurrentPopup();
+      marker.openPopup();
+      openPopupIdRef.current = action.id;
+      setSelected(action.id);
+    };
+
+    closeCurrentPopup();
+
+    const handleMoveEnd = () => {
+      window.setTimeout(openNextPopup, 40);
+    };
+
+    map.once("moveend", handleMoveEnd);
+    map.flyTo(latlng, map.getZoom(), { duration: 0.4 });
+
+    return () => {
+      map.off("moveend", handleMoveEnd);
+    };
+  }, [action, map, markerRefs, openPopupIdRef, setSelected]);
+
   return null;
 }
 
@@ -391,7 +421,6 @@ function Controls({
 }) {
   return (
     <div className="controls" role="group" aria-label="Map and data controls">
-      {/* Search */}
       <label className="search" htmlFor="map-search">
         <Search className="icon" aria-hidden="true" />
         <span className="sr-only">Search campus locations</span>
@@ -402,7 +431,6 @@ function Controls({
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         placeholder="Search buildings, parking…"
-        // NOTE: no aria-label needed because the label above is associated via htmlFor/id
       />
 
       {isEdit && (
@@ -437,11 +465,11 @@ function Controls({
 export default function AccessibleCampusMap() {
   const dims = useImageDimensions(IMG_SRC);
   const [features, setFeatures] = useState(INITIAL_FEATURES);
-  const [focusId, setFocusId] = useState(null);
   const [announce, setAnnounce] = useState("");
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState(null);
-  const [openSections, setOpenSections] = useState(["buildings"]); // default open
+  const [directoryAction, setDirectoryAction] = useState(null);
+  const [openSections, setOpenSections] = useState(["buildings"]);
 
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
@@ -462,6 +490,8 @@ export default function AccessibleCampusMap() {
   const mapRef = useRef(null);
   const shellRef = useRef(null);
   const fileRef = useRef(null);
+  const markerRefs = useRef({});
+  const openPopupIdRef = useRef(null);
 
   const focusShell = () => shellRef.current?.focus();
 
@@ -585,9 +615,17 @@ export default function AccessibleCampusMap() {
   };
 
   const onSelectList = (f) => {
-    setFocusId(f.id);
+    setSelected(f.id);
     setAnnounce(`Moved to ${f.name}`);
     focusShell();
+
+    if (!f.xy) return;
+
+    setDirectoryAction({
+      id: f.id,
+      xy: f.xy,
+      nonce: Date.now(),
+    });
   };
 
   const handleFieldChange = (id, field, value) => {
@@ -599,12 +637,12 @@ export default function AccessibleCampusMap() {
     focusShell();
     mapRef.current?.zoomIn();
   };
+
   const zoomOut = () => {
     focusShell();
     mapRef.current?.zoomOut();
   };
 
-  // Keyboard navigation: arrows pan, + / - zoom, Home/End reset
   const handleKeyNav = (e) => {
     if (!shellRef.current || document.activeElement !== shellRef.current) return;
     const map = mapRef.current;
@@ -676,7 +714,6 @@ export default function AccessibleCampusMap() {
         <div className="main">
           <h1 className="h1">KCC Campus Map (Accessible Interactive)</h1>
 
-          {/* Legend */}
           <div className="legend" aria-label="Map legend">
             <span>
               <span className="dot" style={{ background: "#004b87" }}></span>
@@ -711,7 +748,6 @@ export default function AccessibleCampusMap() {
             onZoomOut={zoomOut}
           />
 
-          {/* ✅ Hidden file input labeled (prevents WAVE “Missing form label”) */}
           <label htmlFor="map-import" className="sr-only">
             Import CSV of map points
           </label>
@@ -758,14 +794,36 @@ export default function AccessibleCampusMap() {
                 attributionControl={false}
               >
                 <ImageOverlay url={IMG_SRC} bounds={bounds} />
+
+                <DirectoryFlyTo
+                  action={directoryAction}
+                  markerRefs={markerRefs}
+                  openPopupIdRef={openPopupIdRef}
+                  setSelected={setSelected}
+                />
+
                 {features.map((f) => (
                   <Marker
                     key={f.id}
                     position={f.xy}
                     icon={getIcon(f.category, f)}
                     draggable={isEdit}
-                    eventHandlers={{ dragend: (e) => onMarkerDrag(f.id, e) }}
+                    eventHandlers={{
+                      dragend: (e) => onMarkerDrag(f.id, e),
+                      popupopen: () => {
+                        openPopupIdRef.current = f.id;
+                        setSelected(f.id);
+                      },
+                      popupclose: () => {
+                        if (openPopupIdRef.current === f.id) {
+                          openPopupIdRef.current = null;
+                        }
+                      },
+                    }}
                     title={f.name}
+                    ref={(ref) => {
+                      if (ref) markerRefs.current[f.id] = ref;
+                    }}
                   >
                     <Popup>
                       <div className="popup">
@@ -794,7 +852,6 @@ export default function AccessibleCampusMap() {
                     </Popup>
                   </Marker>
                 ))}
-                {focusId && <FlyTo xy={features.find((f) => f.id === focusId)?.xy} bounds={bounds} />}
               </MapContainer>
             ) : (
               <div className="loading">Loading map image…</div>
@@ -837,14 +894,10 @@ export default function AccessibleCampusMap() {
                           <li key={f.id}>
                             <button
                               className={`listItem ${selected === f.id ? "isSel" : ""}`}
-                              onClick={() => {
-                                setSelected(f.id);
-                                onSelectList(f);
-                              }}
+                              onClick={() => onSelectList(f)}
                               onKeyDown={(e) => {
                                 if (e.key === "Enter" || e.key === " ") {
                                   e.preventDefault();
-                                  setSelected(f.id);
                                   onSelectList(f);
                                 }
                               }}
