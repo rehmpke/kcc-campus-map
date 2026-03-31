@@ -110,6 +110,38 @@
 }
 
 /* -------------------------------------------------------
+   Marker polish
+------------------------------------------------------- */
+
+.customMarker {
+    background: transparent;
+    border: 0;
+}
+
+.customMarker svg {
+    display: block;
+    transform-origin: center center;
+}
+
+.customMarker.isSelected svg {
+    animation: markerSelectIn 180ms ease-out;
+}
+
+@keyframes markerSelectIn {
+    0% {
+        transform: scale(0.9);
+    }
+
+    70% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* -------------------------------------------------------
    Popup styling
 ------------------------------------------------------- */
 
@@ -197,11 +229,20 @@
     border-radius: 2px;
 }
 
+.popupFooter {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #d6dde6;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 .linkBtn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 14px;
+    margin-top: 0;
     padding: 8px 12px;
     background: #f3f6fa;
     color: #0b4ea2;
