@@ -58,7 +58,9 @@ export const INITIAL_FEATURES = [
         }
       ],
       "notes": [
-        "Accessible restrooms near north entrance."
+        "Nearest visitor parking: Lot 5",
+        "Accessible entrance: north lobby doors",
+        "Elevator access available inside main lobby"
       ]
     }
   },
@@ -92,7 +94,9 @@ export const INITIAL_FEATURES = [
         }
       ],
       "notes": [
-        "Accessible restrooms near north entrance."
+        "Nearest visitor parking: Lot 5",
+        "Accessible entrance: north lobby doors",
+        "Elevator access available inside main lobby"
       ]
     }
   },
