@@ -394,9 +394,11 @@ export default function AccessibleCampusMap() {
                           </a>
                         )}
 
-                        <div className="popupCoords">
-                          [{Math.round(f.xy[0])}, {Math.round(f.xy[1])}]
-                        </div>
+                        {isEdit && (
+                          <div className="popupCoords">
+                            [{Math.round(f.xy[0])}, {Math.round(f.xy[1])}]
+                          </div>
+                        )}
                       </div>
                     </Popup>
                   </Marker>
