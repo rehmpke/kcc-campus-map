@@ -332,7 +332,7 @@ export default function AccessibleCampusMap() {
                   <Marker
                     key={f.id}
                     position={f.xy}
-                    icon={getIcon(f.category, f)}
+                    icon={getIcon(f.category, f, selected === f.id)}
                     draggable={isEdit}
                     eventHandlers={{
                       dragend: (e) => onMarkerDrag(f.id, e),

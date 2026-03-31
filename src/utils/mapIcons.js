@@ -1,58 +1,65 @@
 // src/utils/mapIcons.js
 import L from "leaflet";
 
-export const CATEGORY_STYLES = {
-  building: { color: "#004b87", glyph: "B" },
-  parking: { color: "#00695c", glyph: "P" },
-  entrance: { color: "#0079c1", glyph: "♿" },
-  landmark: { color: "#ff6f00", glyph: "L" },
-  service: { color: "#6d4c41", glyph: "S" },
-  emergency: { color: "#b71c1c", glyph: "E" },
-  assembly: { color: "#33691e", glyph: "A" },
-  campus: { color: "#283593", glyph: "C" },
-  wifi: { color: "#1e88e5", glyph: "W" },
-  other: { color: "#424242", glyph: "•" },
+const COLORS = {
+  building: "#004b87",
+  parking: "#00695c",
+  entrance: "#0079c1",
+  landmark: "#ff6f00",
+  service: "#6d4c41",
+  other: "#555",
 };
 
-export function getGlyphForFeature(feature) {
-  if (feature?.glyph) return feature.glyph;
+function buildSvg(category, glyph, isSelected = false) {
+  const fill = COLORS[category] || COLORS.other;
 
-  if (feature?.category && CATEGORY_STYLES[feature.category]) {
-    return CATEGORY_STYLES[feature.category].glyph;
-  }
+  const size = isSelected ? 54 : 46;
+  const radius = isSelected ? 24 : 20;
+  const stroke = isSelected ? 4 : 3;
+  const fontSize = isSelected ? 20 : 17;
+  const shadowOpacity = isSelected ? 0.35 : 0.22;
 
-  const c = feature?.name?.trim()?.[0];
-  return c ? c.toUpperCase() : "•";
-}
-
-export function makeMarkerSvg(bgColor, glyphText) {
   return `
-    <svg xmlns='http://www.w3.org/2000/svg'
-         width='44' height='44' viewBox='0 0 44 44'
-         aria-hidden='true' focusable='false'>
-      <circle cx='22' cy='22' r='20' fill='white'/>
-      <circle cx='22' cy='22' r='18' fill='${bgColor}'/>
-      <text x='22' y='27'
-        text-anchor='middle'
-        font-family='Arial, sans-serif'
-        font-weight='700'
-        font-size='18'
-        fill='white'>
-        ${glyphText}
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <defs>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="${shadowOpacity}" />
+        </filter>
+      </defs>
+      <circle
+        cx="${size / 2}"
+        cy="${size / 2}"
+        r="${radius}"
+        fill="${fill}"
+        stroke="#fff"
+        stroke-width="${stroke}"
+        filter="url(#shadow)"
+      />
+      <text
+        x="50%"
+        y="52%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-family="system-ui, sans-serif"
+        font-size="${fontSize}"
+        font-weight="700"
+        fill="#fff"
+      >
+        ${glyph || "•"}
       </text>
     </svg>
   `;
 }
 
-export function getIcon(category = "building", feature = null) {
-  const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.building;
-  const glyph = getGlyphForFeature(feature || { category, name: "" });
-  const svg = makeMarkerSvg(style.color, glyph);
+export function getIcon(category, feature, isSelected = false) {
+  const glyph = feature?.glyph || feature?.name?.charAt(0) || "•";
+  const size = isSelected ? 54 : 46;
 
-  return new L.Icon({
-    iconUrl: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    iconSize: [44, 44],
-    iconAnchor: [22, 44],
-    popupAnchor: [0, -32],
+  return L.divIcon({
+    className: "customMarker",
+    html: buildSvg(category, glyph, isSelected),
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size / 2],
   });
 }
