@@ -237,7 +237,7 @@ export default function AccessibleCampusMap() {
 
       <div className="grid">
         <div className="main">
-          <h1 className="h1">KCC Campus Map (Accessible Interactive)</h1>
+          <h1 className="h1">Campus Map</h1>
 
           <div className="legend" aria-label="Map legend">
             <span>
