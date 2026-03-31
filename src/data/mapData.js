@@ -111,6 +111,20 @@ export const INITIAL_FEATURES = [
     "imgAlt": "Campus map with marker indicating the approximate location of Building T (ATEC)."
   },
   {
+    "id": "pt-1763069975175",
+    "name": "Building V – Technology",
+    "xy": [
+      944.6481909768765,
+      1022.4768116077321
+    ],
+    "desc": "",
+    "category": "building",
+    "url": "",
+    "img": "",
+    "imgAlt": "Building V",
+    "glyph": "V"
+  },
+  {
     "id": "riverfront",
     "name": "Riverfront Campus",
     "glyph": "RC",
@@ -131,20 +145,6 @@ export const INITIAL_FEATURES = [
     "desc": "Visitor lot with 6 accessible spaces near Building T. Open Parking",
     "category": "parking",
     "glyph": "P5"
-  },
-  {
-    "id": "pt-1763069975175",
-    "name": "Building V – Technology",
-    "xy": [
-      944.6481909768765,
-      1022.4768116077321
-    ],
-    "desc": "",
-    "category": "building",
-    "url": "",
-    "img": "",
-    "imgAlt": "Building V",
-    "glyph": "V"
   },
   {
     "id": "pt-1763071079282",
