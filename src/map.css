@@ -346,22 +346,6 @@
     outline-offset: 2px;
 }
 
-.controls .zoomGroup {
-    display: flex;
-    gap: 8px;
-    flex: 0 0 auto;
-}
-
-.zoomBtn {
-    width: 42px !important;
-    height: 42px !important;
-    padding: 0 !important;
-    justify-content: center;
-    font-size: 1.4rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
 /* -------------------------------------------------------
    Directory Panel / Accordion
 ------------------------------------------------------- */
@@ -544,11 +528,6 @@
     .searchWrap {
         align-items: stretch;
     }
-
-    .zoomBtn {
-        width: 50px !important;
-        height: 50px !important;
-    }
 }
 
 @media (max-width: 640px) {
@@ -567,10 +546,6 @@
     .searchWrap {
         flex-direction: column;
         align-items: stretch;
-    }
-
-    .controls .zoomGroup {
-        justify-content: flex-start;
     }
 
     .search {

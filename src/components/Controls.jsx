@@ -9,8 +9,6 @@ export default function Controls({
   onExport,
   onImportClick,
   onDownloadCSV,
-  onZoomIn,
-  onZoomOut,
 }) {
   return (
     <div className="controls" role="group" aria-label="Map and data controls">
@@ -26,27 +24,6 @@ export default function Controls({
             placeholder="Search buildings, parking…"
           />
         </label>
-
-        <div className="zoomGroup" role="group" aria-label="Map zoom">
-          <button
-            className="btn zoomBtn"
-            onClick={onZoomIn}
-            aria-label="Zoom in"
-            title="Zoom in"
-            type="button"
-          >
-            +
-          </button>
-          <button
-            className="btn zoomBtn"
-            onClick={onZoomOut}
-            aria-label="Zoom out"
-            title="Zoom out"
-            type="button"
-          >
-            −
-          </button>
-        </div>
       </div>
 
       {isEdit && (

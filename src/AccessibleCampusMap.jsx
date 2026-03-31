@@ -164,16 +164,6 @@ export default function AccessibleCampusMap() {
     );
   };
 
-  const zoomIn = () => {
-    focusShell();
-    mapRef.current?.zoomIn();
-  };
-
-  const zoomOut = () => {
-    focusShell();
-    mapRef.current?.zoomOut();
-  };
-
   const handleKeyNav = (e) => {
     if (!shellRef.current || document.activeElement !== shellRef.current) return;
 
@@ -280,8 +270,6 @@ export default function AccessibleCampusMap() {
             onExport={exportJson}
             onDownloadCSV={downloadCSV}
             onImportClick={triggerImport}
-            onZoomIn={zoomIn}
-            onZoomOut={zoomOut}
           />
 
           <label htmlFor="map-import" className="sr-only">
@@ -418,7 +406,11 @@ export default function AccessibleCampusMap() {
         <div id="directory" className="side">
           <h2 className="h2">Directory</h2>
 
-          <div className="accordion" role="navigation" aria-label="Campus locations directory">
+          <div
+            className="accordion"
+            role="navigation"
+            aria-label="Campus locations directory"
+          >
             {DIRECTORY_SECTIONS.map((section) => {
               const items = filtered.filter((f) =>
                 section.categories.includes(f.category)
