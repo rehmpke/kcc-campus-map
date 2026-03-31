@@ -3,6 +3,39 @@
 export const INITIAL_FEATURES = [
 
   {
+    "id": "pt-1763072892251",
+    "name": "Building 4",
+    "xy": [
+      449.4422406003043,
+      242.59804813192954
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "4"
+  },
+  {
+    "id": "pt-1763072852899",
+    "name": "Building 5",
+    "xy": [
+      596.7764767541069,
+      249.25492821242187
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "5"
+  },
+  {
+    "id": "pt-1763072937355",
+    "name": "Building A",
+    "xy": [
+      722.2932843642988,
+      322.89810524960245
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "A"
+  },
+  {
     "id": "pt-1763070268994",
     "name": "Building D – WDC",
     "xy": [
@@ -86,7 +119,18 @@ export const INITIAL_FEATURES = [
       ]
     }
   },
-    {
+  {
+    "id": "pt-1763071535071",
+    "name": "Building M – Health Careers Center For Excelence",
+    "xy": [
+      1127.1074645843232,
+      1205.6170619230634
+    ],
+    "desc": "",
+    "category": "building",
+    "glyph": "M"
+  },
+  {
     "id": "pt-1763070140472",
     "name": "Building R – Arts & Sciences",
     "xy": [
@@ -125,59 +169,18 @@ export const INITIAL_FEATURES = [
     "glyph": "V"
   },
   {
-    "id": "riverfront",
-    "name": "Riverfront Campus",
-    "glyph": "RC",
+    "id": "pt-1763222088162",
+    "name": "Building VA",
     "xy": [
-      1192.3184882251576,
-      1575.7534551964682
-    ],
-    "desc": "Kankakee Riverfront with accessible paths.",
-    "category": "landmark"
-  },
-  {
-    "id": "parking-5",
-    "name": "Parking Lot 5",
-    "xy": [
-      673.1602440477584,
-      1139.8561312727145
-    ],
-    "desc": "Visitor lot with 6 accessible spaces near Building T. Open Parking",
-    "category": "parking",
-    "glyph": "P5"
-  },
-  {
-    "id": "pt-1763071079282",
-    "name": "Parking Lot 13",
-    "xy": [
-      845.6970044781933,
-      848.528137423857
-    ],
-    "desc": "Staff Parking lot",
-    "category": "parking",
-    "glyph": "P13"
-  },
-  {
-    "id": "pt-1763071338295",
-    "name": "Parking Lot 8",
-    "xy": [
-      1125.0019281961152,
-      925.6026704952725
-    ],
-    "desc": "Circle Drive by R and M building",
-    "category": "parking",
-    "glyph": "P8"
-  },
-  {
-    "id": "pt-1763071429919",
-    "name": "Parking Lot 7",
-    "xy": [
-      1048.634395827968,
-      1062.0743853421943
+      593.28694180377,
+      458.1897068328429
     ],
     "desc": "",
-    "category": "parking",
-    "glyph": "P7"
+    "category": "building",
+    "url": "",
+    "img": "",
+    "imgAlt": "Building VA",
+    "glyph": "VA"
   },
   {
     "id": "pt-1763071463190",
@@ -189,61 +192,6 @@ export const INITIAL_FEATURES = [
     "desc": "",
     "category": "building",
     "glyph": "W"
-  },
-  {
-    "id": "pt-1763071535071",
-    "name": "Building M – Health Careers Center For Excelence",
-    "xy": [
-      1127.1074645843232,
-      1205.6170619230634
-    ],
-    "desc": "",
-    "category": "building",
-    "glyph": "M"
-  },
-  {
-    "id": "pt-1763071843209",
-    "name": "Parking Lot 6",
-    "xy": [
-      763.6712649500953,
-      994.1921343482858
-    ],
-    "desc": "",
-    "category": "parking",
-    "glyph": "P6"
-  },
-  {
-    "id": "pt-1763072015459",
-    "name": "West Campus",
-    "xy": [
-      1042.6341896618696,
-      373.54486448851696
-    ],
-    "desc": "",
-    "category": "landmark",
-    "glyph": "WC"
-  },
-  {
-    "id": "pt-1763072112804",
-    "name": "Parking Lot 14",
-    "xy": [
-      893.7865791810192,
-      210.71760863775486
-    ],
-    "desc": "",
-    "category": "parking",
-    "glyph": "P14"
-  },
-  {
-    "id": "pt-1763072316063",
-    "name": "Prairie Acre",
-    "xy": [
-      1064.1663926258154,
-      149.9058950661214
-    ],
-    "desc": "",
-    "category": "landmark",
-    "glyph": "PA"
   },
   {
     "id": "pt-1763072485335",
@@ -260,26 +208,26 @@ export const INITIAL_FEATURES = [
     "glyph": "GH"
   },
   {
-    "id": "pt-1763072531800",
-    "name": "Parking Lot 11",
+    "id": "riverfront",
+    "name": "Riverfront Campus",
+    "glyph": "RC",
     "xy": [
-      770.9955356232549,
-      355
+      1192.3184882251576,
+      1575.7534551964682
     ],
-    "desc": "",
-    "category": "parking",
-    "glyph": "P11"
+    "desc": "Kankakee Riverfront with accessible paths.",
+    "category": "landmark"
   },
   {
-    "id": "pt-1763072564256",
-    "name": "Parking Lot 10",
+    "id": "pt-1763222541246",
+    "name": "P1",
     "xy": [
-      713.9948978551483,
-      456.000300033661
+      847.081454010475,
+      1523.8901105450932
     ],
     "desc": "",
     "category": "parking",
-    "glyph": "P10"
+    "glyph": "P1"
   },
   {
     "id": "pt-1763072771898",
@@ -293,73 +241,48 @@ export const INITIAL_FEATURES = [
     "glyph": "P4"
   },
   {
-    "id": "pt-1763072796818",
-    "name": "Parking Lot 12",
+    "id": "parking-5",
+    "name": "Parking Lot 5",
     "xy": [
-      712.7699490181803,
-      239.00209204105306
+      673.1602440477584,
+      1139.8561312727145
+    ],
+    "desc": "Visitor lot with 6 accessible spaces near Building T. Open Parking",
+    "category": "parking",
+    "glyph": "P5"
+  },
+  {
+    "id": "pt-1763071843209",
+    "name": "Parking Lot 6",
+    "xy": [
+      763.6712649500953,
+      994.1921343482858
     ],
     "desc": "",
     "category": "parking",
-    "glyph": "P12"
+    "glyph": "P6"
   },
   {
-    "id": "pt-1763072852899",
-    "name": "Building 5",
+    "id": "pt-1763071429919",
+    "name": "Parking Lot 7",
     "xy": [
-      596.7764767541069,
-      249.25492821242187
+      1048.634395827968,
+      1062.0743853421943
     ],
     "desc": "",
-    "category": "building",
-    "glyph": "5"
+    "category": "parking",
+    "glyph": "P7"
   },
   {
-    "id": "pt-1763072892251",
-    "name": "Building 4",
+    "id": "pt-1763071338295",
+    "name": "Parking Lot 8",
     "xy": [
-      449.4422406003043,
-      242.59804813192954
+      1125.0019281961152,
+      925.6026704952725
     ],
-    "desc": "",
-    "category": "building",
-    "glyph": "4"
-  },
-  {
-    "id": "pt-1763072937355",
-    "name": "Building A",
-    "xy": [
-      722.2932843642988,
-      322.89810524960245
-    ],
-    "desc": "",
-    "category": "building",
-    "glyph": "A"
-  },
-  {
-    "id": "pt-1763072989292",
-    "name": "Golf Course",
-    "xy": [
-      128.20904153203196,
-      408.17684979772935
-    ],
-    "desc": "",
-    "category": "landmark",
-    "glyph": "GC"
-  },
-  {
-    "id": "pt-1763222088162",
-    "name": "Building VA",
-    "xy": [
-      593.28694180377,
-      458.1897068328429
-    ],
-    "desc": "",
-    "category": "building",
-    "url": "",
-    "img": "",
-    "imgAlt": "Building VA",
-    "glyph": "VA"
+    "desc": "Circle Drive by R and M building",
+    "category": "parking",
+    "glyph": "P8"
   },
   {
     "id": "pt-1763222202968",
@@ -373,6 +296,94 @@ export const INITIAL_FEATURES = [
     "glyph": "P9"
   },
   {
+    "id": "pt-1763072564256",
+    "name": "Parking Lot 10",
+    "xy": [
+      713.9948978551483,
+      456.000300033661
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P10"
+  },
+  {
+    "id": "pt-1763072531800",
+    "name": "Parking Lot 11",
+    "xy": [
+      770.9955356232549,
+      355
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P11"
+  },
+  {
+    "id": "pt-1763072796818",
+    "name": "Parking Lot 12",
+    "xy": [
+      712.7699490181803,
+      239.00209204105306
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P12"
+  },
+  {
+    "id": "pt-1763071079282",
+    "name": "Parking Lot 13",
+    "xy": [
+      845.6970044781933,
+      848.528137423857
+    ],
+    "desc": "Staff Parking lot",
+    "category": "parking",
+    "glyph": "P13"
+  },
+  {
+    "id": "pt-1763072112804",
+    "name": "Parking Lot 14",
+    "xy": [
+      893.7865791810192,
+      210.71760863775486
+    ],
+    "desc": "",
+    "category": "parking",
+    "glyph": "P14"
+  },
+  {
+    "id": "pt-1763072015459",
+    "name": "West Campus",
+    "xy": [
+      1042.6341896618696,
+      373.54486448851696
+    ],
+    "desc": "",
+    "category": "landmark",
+    "glyph": "WC"
+  },
+  {
+    "id": "pt-1763072316063",
+    "name": "Prairie Acre",
+    "xy": [
+      1064.1663926258154,
+      149.9058950661214
+    ],
+    "desc": "",
+    "category": "landmark",
+    "glyph": "PA"
+  },
+  {
+    "id": "pt-1763072989292",
+    "name": "Golf Course",
+    "xy": [
+      128.20904153203196,
+      408.17684979772935
+    ],
+    "desc": "",
+    "category": "landmark",
+    "glyph": "GC"
+  },
+  {
     "id": "pt-1763222289152",
     "name": "PM",
     "xy": [
@@ -382,17 +393,6 @@ export const INITIAL_FEATURES = [
     "desc": "",
     "category": "parking",
     "glyph": "PM"
-  },
-  {
-    "id": "pt-1763222541246",
-    "name": "P1",
-    "xy": [
-      847.081454010475,
-      1523.8901105450932
-    ],
-    "desc": "",
-    "category": "parking",
-    "glyph": "P1"
   }
 ];
 
