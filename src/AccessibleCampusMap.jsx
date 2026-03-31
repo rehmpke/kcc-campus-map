@@ -287,11 +287,11 @@ export default function AccessibleCampusMap() {
             aria-label="Import CSV of map points"
           />
 
+         {isEdit && (
           <div className="modeTag">
-            {isEdit
-              ? "Editor mode – unsaved changes; use Export JSON to persist"
-              : "Viewer mode – read-only"}
+            Editor mode – unsaved changes; use Export JSON to persist
           </div>
+          )}
 
           <div
             id="map-region"
