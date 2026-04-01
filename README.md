@@ -2,7 +2,7 @@
 
 An accessible, WCAG 2.1 AA–compliant interactive campus map for Kankakee Community College built with **React**, **Vite**, **Leaflet**, and **React-Leaflet**.
 
-This project replaces the legacy static PDF campus map with an interactive, keyboard-operable, screen-reader-friendly campus navigation experience. It is designed as a **public-facing accessibility bridge solution** that supports the DOJ ADA WCAG 2.1 AA compliance timeline and is intentionally separate from the College’s longer-term enterprise wayfinding initiative.
+This project replaces the legacy static PDF campus map with an interactive, keyboard-operable, screen-reader-friendly campus navigation experience. It is designed as a **public-facing accessibility bridge solution** that supports the DOJ ADA WCAG 2.1 AA compliance timeline and remains intentionally separate from the College’s longer-term enterprise wayfinding initiative.
 
 ---
 
@@ -14,11 +14,12 @@ This map is designed to support:
 - accessible building discovery
 - parking and entrance wayfinding
 - student services discovery
-- destination search
+- destination-first search
 - campus-specific accessibility needs
 - text alternatives for all mapped locations
+- public bridge wayfinding before enterprise campus wayfinding matures
 
-This project is **not** intended to replicate every room number, office, or internal facilities inventory reference from the old PDF maps.
+This project is **not intended to recreate every room number, office, or internal facilities inventory reference** from the legacy PDF maps.
 
 The focus is:
 
@@ -29,6 +30,7 @@ The focus is:
 - safety and emergency locations
 - student-facing destinations
 - service locations
+- accessible arrival instructions
 
 ---
 
@@ -47,18 +49,31 @@ The focus is:
 
 ### ✔ Viewer Mode (Default)
 
-- Static image-overlay campus map
+- Static image-overlay campus map using **Leaflet Simple CRS**
 - Keyboard panning and zoom
 - Accordion directory grouped by category
-- Search across buildings, parking, and descriptions
-- Directory click → `flyTo` → popup opens automatically
-- Previously open popup closes before the next opens
+- Destination-first ranked search across:
+  - building names
+  - descriptions
+  - popup resource link labels
+  - resource notes
+  - arrival and access guidance
+- Search result selection:
+  - flies to the marker
+  - opens the popup
+  - syncs directory selected state
+  - collapses search results after destination selection
+  - keeps search text visible for orientation
+- Directory click → unified destination focus behavior
+- Marker click uses the same popup focus pipeline
+- Selected marker animation state
 - Accessible popup content with:
   - title
   - description
   - image
-  - resource links
-  - service notes
+  - **Arrival & Access**
+  - **Available Services & Resources**
+  - footer CTA zone
 - Skip links to map and directory
 - Screen-reader live announcements
 - Mobile and desktop compatible
@@ -73,7 +88,8 @@ Editor mode supports:
 - export JSON
 - download CSV
 - import CSV
-- manage popup resource content
+- manage popup resources
+- manage arrival and access guidance
 
 Current editable fields:
 
@@ -84,6 +100,7 @@ Current editable fields:
 - `url`
 - `img`
 - `imgAlt`
+- `arrival`
 - `resources`
 
 ---
@@ -112,9 +129,11 @@ The map is intentionally built around accessibility-first interaction.
 - `aria-live` announcements
 - grouped accordion directory as text alternative
 - accessible popup links
+- logical reading order
 - no pointer-only interaction requirements
 - visible focus indicators
-- logical reading order
+- text-equivalent arrival guidance
+- mobile-safe popup reading flow
 
 ---
 
@@ -150,18 +169,40 @@ Each map feature currently supports:
   glyph: "G",
   url: "/facilities/activities-center",
   img: "/images/map/building-g.jpg",
-  imgAlt: "Building G entry facing Parking Lot 5",
+  imgAlt: "Building G entry from the P1 parking area",
+
+  arrival: {
+    heading: "Arrival & Access",
+    parking: "Closest accessible parking: Lot P1",
+    entrance: "Main entrance facing the P1 parking area",
+    route: "Use the short sidewalk crossing from P1 directly to Building G.",
+    elevator: "Available inside main lobby",
+    restroom: "Accessible restrooms near lobby entrance"
+  },
+
   resources: {
     heading: "Available Services & Resources",
     links: [
-      { "label": "Admissions", "href": "/admissions" }
+      { label: "Athletics", href: "/athletics" },
+      { label: "Fitness Center", href: "/fitness-center" }
     ],
     notes: [
-      "Accessible restrooms near north entrance"
+      "Public event seating available."
     ]
   }
 }
 ```
+
+### Arrival model
+
+Popup arrival content is structured as:
+
+- `arrival.heading`
+- `arrival.parking`
+- `arrival.entrance`
+- `arrival.route`
+- `arrival.elevator`
+- `arrival.restroom`
 
 ### Resource model
 
@@ -171,13 +212,13 @@ Popup resource content is structured as:
 - `resources.links[]`
 - `resources.notes[]`
 
-This replaces the need for raw HTML in popup content and keeps rendering safer and easier to maintain.
+This keeps popup rendering safe, structured, and maintainable.
 
 ---
 
 ## 📁 Current File Structure
 
-The project is now transitioning from a single-file architecture into controlled modules.
+The project is now fully modularized and should **not be collapsed back into a single-file implementation**.
 
 ```text
 src/
@@ -194,17 +235,26 @@ src/
     Controls.jsx
     DirectoryFlyTo.jsx
     FeatureEditor.jsx
+    PopupArrival.jsx
     PopupResources.jsx
 ```
 
 ### Ownership model
 
-- `AccessibleCampusMap.jsx` → orchestration + state
-- `data/` → map seed data + directory sections
-- `utils/` → icons, CSV, parsing
-- `components/` → focused UI and behavior modules
+- `AccessibleCampusMap.jsx` → orchestration + state + selection flow
+- `data/` → seed map datasets + directory sections
+- `utils/` → icons, CSV, parsing helpers
+- `components/Controls.jsx` → search + admin controls
+- `components/DirectoryFlyTo.jsx` → viewport + popup sync
+- `components/PopupArrival.jsx` → arrival guidance rendering
+- `components/PopupResources.jsx` → services/resources rendering
+- `components/FeatureEditor.jsx` → editor mode metadata updates
 
-This structure reduces regression risk as popup logic, editor mode, and multiple datasets continue to evolve.
+This structure reduces regression risk as:
+- popup logic evolves
+- search ranking improves
+- multiple campus datasets are added
+- editor workflows mature
 
 ---
 
@@ -223,7 +273,8 @@ Supported CSV fields:
 | `img` | Optional image |
 | `imgAlt` | Required if image is present |
 | `glyph` | Marker badge text |
-| `resourcesJson` | Popup resource object |
+| `arrivalJson` | Structured arrival object |
+| `resourcesJson` | Structured resource object |
 
 CSV import replaces the active in-memory dataset.
 
@@ -264,19 +315,25 @@ Deploy the `dist/` folder to any static host:
 
 ### Near-term
 
+- standardize arrival/access data for major public buildings
 - replace raw resources JSON textarea with structured add/remove UI
-- support multiple campus datasets (Main, SEC, MITC)
-- enrich student services and public destinations
-- improve popup timing under rapid repeated clicks
-- improve mobile directory interaction patterns
+- add structured arrival editing in editor mode
+- support multiple campus datasets:
+  - Main
+  - Riverfront
+  - SEC
+  - MITC
+- continue popup rhythm and spacing polish
+- enrich destination-level service metadata
 
 ### Mid-term
 
 - campus switcher
-- destination-first search experience
+- campus-aware search
 - service category enrichment
 - analytics for most-used destinations
 - CMS-connected dataset workflows
+- public event and seasonal routing overlays
 
 ---
 
@@ -285,4 +342,3 @@ Deploy the `dist/` folder to any static host:
 **Roger J. Ehmpke**  
 Director of Web Strategy and Digital Experience  
 Kankakee Community College
-
