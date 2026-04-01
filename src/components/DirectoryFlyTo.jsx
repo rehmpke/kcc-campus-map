@@ -1,54 +1,57 @@
 // src/components/DirectoryFlyTo.jsx
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
-import L from "leaflet";
+
+const Y_OFFSET_PIXELS = 140;
+const MIN_FOCUS_ZOOM = 0;
 
 export default function DirectoryFlyTo({
   action,
   markerRefs,
   openPopupIdRef,
+  pendingFocusIdRef,
   setSelected,
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (!action?.xy) return;
+    if (!action?.xy || !map) return;
 
-    const [y, x] = action.xy;
-    const latlng = L.latLng(y, x);
+    const [lat, lng] = action.xy;
+    const targetZoom = Math.max(map.getZoom(), MIN_FOCUS_ZOOM);
 
     const closeCurrentPopup = () => {
       const openId = openPopupIdRef.current;
-      const currentMarker = openId ? markerRefs.current[openId] : null;
+      const currentMarker = openId ? markerRefs.current?.[openId] : null;
 
       if (currentMarker?.closePopup) currentMarker.closePopup();
-      map.closePopup();
       openPopupIdRef.current = null;
-    };
-
-    const openNextPopup = () => {
-      const marker = markerRefs.current[action.id];
-      if (!marker?.openPopup) return;
-
-      closeCurrentPopup();
-      marker.openPopup();
-      openPopupIdRef.current = action.id;
-      setSelected(action.id);
     };
 
     closeCurrentPopup();
 
-    const handleMoveEnd = () => {
-      window.setTimeout(openNextPopup, 40);
-    };
+    const markerPoint = map.project([lat, lng], targetZoom);
+    const adjustedCenterPoint = markerPoint.subtract([0, Y_OFFSET_PIXELS]);
+    const adjustedCenterLatLng = map.unproject(adjustedCenterPoint, targetZoom);
 
-    map.once("moveend", handleMoveEnd);
-    map.flyTo(latlng, map.getZoom(), { duration: 0.4 });
+    map.setView(adjustedCenterLatLng, targetZoom, {
+      animate: false,
+    });
+
+    const frame = window.requestAnimationFrame(() => {
+      const marker = markerRefs.current?.[action.id];
+      if (!marker?.openPopup) return;
+
+      pendingFocusIdRef.current = null;
+      marker.openPopup();
+      openPopupIdRef.current = action.id;
+      setSelected(action.id);
+    });
 
     return () => {
-      map.off("moveend", handleMoveEnd);
+      window.cancelAnimationFrame(frame);
     };
-  }, [action, map, markerRefs, openPopupIdRef, setSelected]);
+  }, [action, map, markerRefs, openPopupIdRef, pendingFocusIdRef, setSelected]);
 
   return null;
 }

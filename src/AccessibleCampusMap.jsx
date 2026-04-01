@@ -176,6 +176,7 @@ export default function AccessibleCampusMap() {
   const fileRef = useRef(null);
   const markerRefs = useRef({});
   const openPopupIdRef = useRef(null);
+  const pendingFocusIdRef = useRef(null);
 
   const focusShell = () => shellRef.current?.focus();
 
@@ -275,11 +276,19 @@ export default function AccessibleCampusMap() {
 
   const focusFeatureOnMap = (f, source = "directory") => {
     setSelected(f.id);
+
+    if (source === "marker") {
+      pendingFocusIdRef.current = f.id;
+    }
+
     setAnnounce(
       source === "search"
         ? `Search result selected: ${f.name}`
-        : `Moved to ${f.name}`
+        : source === "marker"
+          ? `Focused ${f.name}`
+          : `Moved to ${f.name}`
     );
+
     focusShell();
 
     if (!f.xy) return;
@@ -297,6 +306,10 @@ export default function AccessibleCampusMap() {
 
   const onSelectSearchResult = (f) => {
     focusFeatureOnMap(f, "search");
+  };
+
+  const onSelectMarker = (f) => {
+    focusFeatureOnMap(f, "marker");
   };
 
   const clearSearch = () => {
@@ -484,6 +497,7 @@ export default function AccessibleCampusMap() {
                   action={directoryAction}
                   markerRefs={markerRefs}
                   openPopupIdRef={openPopupIdRef}
+                  pendingFocusIdRef={pendingFocusIdRef}
                   setSelected={setSelected}
                 />
 
@@ -494,8 +508,16 @@ export default function AccessibleCampusMap() {
                     icon={getIcon(f.category, f, selected === f.id)}
                     draggable={isEdit}
                     eventHandlers={{
+                      click: () => {
+                        onSelectMarker(f);
+                      },
                       dragend: (e) => onMarkerDrag(f.id, e),
-                      popupopen: () => {
+                      popupopen: (e) => {
+                        if (pendingFocusIdRef.current === f.id) {
+                          e.target.closePopup();
+                          return;
+                        }
+
                         openPopupIdRef.current = f.id;
                         setSelected(f.id);
                       },
@@ -510,7 +532,10 @@ export default function AccessibleCampusMap() {
                       if (ref) markerRefs.current[f.id] = ref;
                     }}
                   >
-                    <Popup maxWidth={340}>
+                    <Popup
+                      maxWidth={340}
+                      autoPan={false}
+                    >
                       <div className="popup">
                         {f.img && (
                           <img
