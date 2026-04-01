@@ -11,6 +11,8 @@ export default function Controls({
   onDownloadCSV,
   onClearSearch,
   hasActiveSearch,
+  isSearchResultsOpen,
+  selectedSearchResult,
   searchResults,
   totalSearchResults,
   canShowMore,
@@ -47,7 +49,7 @@ export default function Controls({
             )}
           </label>
 
-          {hasActiveSearch && (
+          {hasActiveSearch && isSearchResultsOpen && (
             <div
               className={`searchResults ${isSingleResult ? "isCompact" : ""}`}
               role="region"
@@ -72,9 +74,7 @@ export default function Controls({
                         aria-label={`Open ${feature.name} on map`}
                       >
                         <span className="searchResultName">{feature.name}</span>
-                        <span className="searchResultMeta">
-                          {feature.matchReason}
-                        </span>
+                        <span className="searchResultMeta">{feature.matchReason}</span>
                       </button>
                     </li>
                   ))}
@@ -94,6 +94,12 @@ export default function Controls({
                   Show all {totalSearchResults} results
                 </button>
               )}
+            </div>
+          )}
+
+          {hasActiveSearch && !isSearchResultsOpen && selectedSearchResult && (
+            <div className="searchSelectionSummary" role="status" aria-live="polite">
+              Showing <strong>{selectedSearchResult.name}</strong> on the map
             </div>
           )}
         </div>

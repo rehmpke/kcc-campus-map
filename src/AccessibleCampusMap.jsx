@@ -50,6 +50,8 @@ function scoreFeature(feature, query) {
     feature?.arrival?.parking || "",
     feature?.arrival?.entrance || "",
     feature?.arrival?.route || "",
+    feature?.arrival?.elevator || "",
+    feature?.arrival?.restroom || "",
     ...(Array.isArray(feature?.arrival?.access) ? feature.arrival.access : []),
   ].map((item) => String(item).toLowerCase());
 
@@ -151,6 +153,8 @@ export default function AccessibleCampusMap() {
   const [directoryAction, setDirectoryAction] = useState(null);
   const [openSections, setOpenSections] = useState(["buildings"]);
   const [showAllSearchResults, setShowAllSearchResults] = useState(false);
+  const [isSearchResultsOpen, setIsSearchResultsOpen] = useState(false);
+  const [selectedSearchResultId, setSelectedSearchResultId] = useState(null);
 
   const trimmedFilter = filter.trim().toLowerCase();
 
@@ -187,6 +191,11 @@ export default function AccessibleCampusMap() {
     return rankedSearchResults;
   }, [features, rankedSearchResults, trimmedFilter]);
 
+  const selectedSearchResult = useMemo(() => {
+    if (!selectedSearchResultId) return null;
+    return rankedSearchResults.find((item) => item.id === selectedSearchResultId) || null;
+  }, [rankedSearchResults, selectedSearchResultId]);
+
   const bounds = useMemo(() => {
     if (!dims) return null;
     return [
@@ -210,17 +219,26 @@ export default function AccessibleCampusMap() {
 
   useEffect(() => {
     setShowAllSearchResults(false);
+
+    if (!trimmedFilter) {
+      setIsSearchResultsOpen(false);
+      setSelectedSearchResultId(null);
+      return;
+    }
+
+    setIsSearchResultsOpen(true);
+    setSelectedSearchResultId(null);
   }, [trimmedFilter]);
 
   useEffect(() => {
-    if (!trimmedFilter) return;
+    if (!trimmedFilter || !isSearchResultsOpen) return;
 
     setAnnounce(
       `${rankedSearchResults.length} result${
         rankedSearchResults.length === 1 ? "" : "s"
       } found for ${filter.trim()}`
     );
-  }, [trimmedFilter, rankedSearchResults.length, filter]);
+  }, [trimmedFilter, rankedSearchResults.length, filter, isSearchResultsOpen]);
 
   const dropPoint = () => {
     if (!dims) return;
@@ -241,6 +259,8 @@ export default function AccessibleCampusMap() {
           parking: "",
           entrance: "",
           route: "",
+          elevator: "",
+          restroom: "",
           access: [],
         },
         resources: {
@@ -312,9 +332,14 @@ export default function AccessibleCampusMap() {
       pendingFocusIdRef.current = f.id;
     }
 
+    if (source === "search") {
+      setSelectedSearchResultId(f.id);
+      setIsSearchResultsOpen(false);
+    }
+
     setAnnounce(
       source === "search"
-        ? `Search result selected: ${f.name}`
+        ? `Showing ${f.name} on map`
         : source === "marker"
           ? `Focused ${f.name}`
           : `Moved to ${f.name}`
@@ -346,7 +371,13 @@ export default function AccessibleCampusMap() {
   const clearSearch = () => {
     setFilter("");
     setShowAllSearchResults(false);
+    setIsSearchResultsOpen(false);
+    setSelectedSearchResultId(null);
     setAnnounce("Search cleared");
+  };
+
+  const handleSearchChange = (value) => {
+    setFilter(value);
   };
 
   const handleFieldChange = (id, field, value) => {
@@ -458,17 +489,20 @@ export default function AccessibleCampusMap() {
             isEdit={isEdit}
             onAddPoint={dropPoint}
             filter={filter}
-            setFilter={setFilter}
+            setFilter={handleSearchChange}
             onExport={exportJson}
             onDownloadCSV={downloadCSV}
             onImportClick={triggerImport}
             onClearSearch={clearSearch}
             hasActiveSearch={Boolean(trimmedFilter)}
+            isSearchResultsOpen={isSearchResultsOpen}
+            selectedSearchResult={selectedSearchResult}
             searchResults={visibleSearchResults}
             totalSearchResults={rankedSearchResults.length}
             canShowMore={
               rankedSearchResults.length > DEFAULT_VISIBLE_RESULTS &&
-              !showAllSearchResults
+              !showAllSearchResults &&
+              isSearchResultsOpen
             }
             onShowAllResults={() => setShowAllSearchResults(true)}
             selected={selected}
@@ -563,10 +597,7 @@ export default function AccessibleCampusMap() {
                       if (ref) markerRefs.current[f.id] = ref;
                     }}
                   >
-                    <Popup
-                      maxWidth={340}
-                      autoPan={false}
-                    >
+                    <Popup maxWidth={340} autoPan={false}>
                       <div className="popup">
                         {f.img ? (
                           <img
