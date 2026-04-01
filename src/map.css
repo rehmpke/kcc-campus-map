@@ -165,7 +165,7 @@
 }
 
 .popupDesc {
-    margin: 0 0 18px;
+    margin: 0 0 14px;
     line-height: 1.55;
     color: #2f2f2f;
     font-size: 1rem;
@@ -189,7 +189,7 @@
 
 .popupRule {
     border-top: 1px solid #c7ccd1;
-    margin: 18px 0;
+    margin: 14px 0;
 }
 
 .popupArrival,
@@ -199,9 +199,9 @@
 
 .popupArrivalHeading,
 .popupResourcesHeading {
-    font-size: 1.1rem;
+    font-size: 1.12rem;
     font-weight: 700;
-    margin: 0 0 12px;
+    margin: 0 0 10px;
     color: #1f1f1f;
 }
 
@@ -215,8 +215,9 @@
 .popupArrivalList li,
 .popupResourceList li,
 .popupNoteList li {
-    margin-bottom: 8px;
-    line-height: 1.45;
+    margin-bottom: 10px;
+    line-height: 1.5;
+    font-size: 1rem;
 }
 
 .popupArrivalList li:last-child,
@@ -234,6 +235,7 @@
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
+    font-size: 1rem;
 }
 
 .popupResourceLink:hover {
@@ -259,7 +261,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 0;
+    margin-top: 16px;
     padding: 8px 12px;
     background: #f3f6fa;
     color: #0b4ea2;

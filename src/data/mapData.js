@@ -72,8 +72,8 @@ export const INITIAL_FEATURES = [
       entrance: "Main entrance facing the P1 parking area",
       route: "Use the short sidewalk crossing from P1 directly to Building G.",
       access: [
-        "Elevator access available inside main lobby",
-        "Accessible restrooms near lobby entrance"
+        "Elevator: Available inside main lobby",
+        "Restroom: Accessible restrooms near lobby entrance"
       ]
     },
     resources: {
