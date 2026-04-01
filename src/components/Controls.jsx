@@ -18,6 +18,8 @@ export default function Controls({
   selected,
   onSelectSearchResult,
 }) {
+  const isSingleResult = totalSearchResults === 1;
+
   return (
     <div className="controls" role="group" aria-label="Map and data controls">
       <div className="searchWrap">
@@ -46,30 +48,42 @@ export default function Controls({
           </label>
 
           {hasActiveSearch && (
-            <div className="searchResults">
+            <div
+              className={`searchResults ${isSingleResult ? "isCompact" : ""}`}
+              role="region"
+              aria-label="Search results"
+            >
               <div className="searchResultsHeader">
                 <span className="searchResultsTitle">
-                  Top {searchResults.length} of {totalSearchResults} result
-                  {totalSearchResults === 1 ? "" : "s"}
+                  {isSingleResult ? "Best match" : `${totalSearchResults} results`}
                 </span>
               </div>
 
-              <ul className="searchResultsList">
-                {searchResults.map((feature) => (
-                  <li key={feature.id}>
-                    <button
-                      type="button"
-                      className={`searchResultItem ${selected === feature.id ? "isSel" : ""}`}
-                      onClick={() => onSelectSearchResult(feature)}
-                    >
-                      <span className="searchResultName">{feature.name}</span>
-                      <span className="searchResultMeta">
-                        {feature.matchReason}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              {searchResults.length ? (
+                <ul className="searchResultsList">
+                  {searchResults.map((feature) => (
+                    <li key={feature.id}>
+                      <button
+                        type="button"
+                        className={`searchResultItem ${selected === feature.id ? "isSel" : ""} ${
+                          isSingleResult ? "isCompact" : ""
+                        }`}
+                        onClick={() => onSelectSearchResult(feature)}
+                        aria-label={`Open ${feature.name} on map`}
+                      >
+                        <span className="searchResultName">{feature.name}</span>
+                        <span className="searchResultMeta">
+                          {feature.matchReason}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="searchNoResults">
+                  No matching destinations found.
+                </div>
+              )}
 
               {canShowMore && (
                 <button
@@ -87,19 +101,39 @@ export default function Controls({
 
       {isEdit && (
         <div className="editorActions">
-          <button onClick={onAddPoint} className="btn" type="button">
+          <button
+            onClick={onAddPoint}
+            className="btn"
+            aria-label="Admin: Add point"
+            type="button"
+          >
             <Plus className="icon" /> Admin » Add point
           </button>
 
-          <button onClick={onExport} className="btn" type="button">
+          <button
+            onClick={onExport}
+            className="btn"
+            aria-label="Export points JSON"
+            type="button"
+          >
             <Download className="icon" /> Export JSON
           </button>
 
-          <button onClick={onDownloadCSV} className="btn" type="button">
+          <button
+            onClick={onDownloadCSV}
+            className="btn"
+            aria-label="Download CSV template"
+            type="button"
+          >
             <Download className="icon" /> Download CSV
           </button>
 
-          <button onClick={onImportClick} className="btn" type="button">
+          <button
+            onClick={onImportClick}
+            className="btn"
+            aria-label="Import CSV of points"
+            type="button"
+          >
             <Download className="icon" /> Import CSV
           </button>
         </div>

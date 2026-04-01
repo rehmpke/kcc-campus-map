@@ -191,7 +191,7 @@ export default function AccessibleCampusMap() {
     if (!trimmedFilter) return;
 
     setAnnounce(
-      `${rankedSearchResults.length} ranked result${
+      `${rankedSearchResults.length} result${
         rankedSearchResults.length === 1 ? "" : "s"
       } found for ${filter.trim()}`
     );
@@ -564,12 +564,6 @@ export default function AccessibleCampusMap() {
 
         <div id="directory" className="side">
           <h2 className="h2">Directory</h2>
-
-          {trimmedFilter ? (
-            <div className="searchDirectoryState" aria-live="polite">
-              Showing directory highlights for search results.
-            </div>
-          ) : null}
 
           <div
             className="accordion"
