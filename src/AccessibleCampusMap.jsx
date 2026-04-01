@@ -11,6 +11,7 @@ import Announcer from "./components/Announcer";
 import Controls from "./components/Controls";
 import DirectoryFlyTo from "./components/DirectoryFlyTo";
 import FeatureEditor from "./components/FeatureEditor";
+import PopupArrival from "./components/PopupArrival";
 import PopupResources from "./components/PopupResources";
 
 const IMG_SRC = "/maps/kcc-campus.png";
@@ -44,6 +45,13 @@ function scoreFeature(feature, query) {
   const notes = Array.isArray(feature?.resources?.notes)
     ? feature.resources.notes
     : [];
+
+  const arrivalFields = [
+    feature?.arrival?.parking || "",
+    feature?.arrival?.entrance || "",
+    feature?.arrival?.route || "",
+    ...(Array.isArray(feature?.arrival?.access) ? feature.arrival.access : []),
+  ].map((item) => String(item).toLowerCase());
 
   if (!q) return null;
 
@@ -87,6 +95,22 @@ function scoreFeature(feature, query) {
 
   if (desc.includes(q)) {
     return { score: 60, matchReason: "Matched on description" };
+  }
+
+  for (const arrivalText of arrivalFields) {
+    if (arrivalText.startsWith(q)) {
+      return {
+        score: 55,
+        matchReason: "Matched on arrival guidance",
+      };
+    }
+
+    if (arrivalText.includes(q)) {
+      return {
+        score: 53,
+        matchReason: "Matched on arrival guidance",
+      };
+    }
   }
 
   for (const note of notes) {
@@ -212,6 +236,13 @@ export default function AccessibleCampusMap() {
         xy,
         desc: "",
         category: "building",
+        arrival: {
+          heading: "Arrival & Access",
+          parking: "",
+          entrance: "",
+          route: "",
+          access: [],
+        },
         resources: {
           heading: "Available Services & Resources",
           links: [],
@@ -537,7 +568,7 @@ export default function AccessibleCampusMap() {
                       autoPan={false}
                     >
                       <div className="popup">
-                        {f.img && (
+                        {f.img ? (
                           <img
                             src={f.img}
                             alt={f.imgAlt || `${f.name} photo`}
@@ -546,12 +577,13 @@ export default function AccessibleCampusMap() {
                             height="124"
                             loading="lazy"
                           />
-                        )}
+                        ) : null}
 
                         <div className="popupTitle">{f.name}</div>
 
                         {f.desc && <div className="popupDesc">{f.desc}</div>}
 
+                        <PopupArrival arrival={f.arrival} />
                         <PopupResources resources={f.resources} />
 
                         {f.url && (
