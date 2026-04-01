@@ -155,7 +155,7 @@ export const INITIAL_FEATURES = [
     ],
     "desc": "Advanced Technology Education Center.",
     "category": "building",
-    "img": "/images/map/building-t.jpg",
+    "img": "https://www.kcc.edu/about/uploads/atec.jpg",
     "imgAlt": "Campus map with marker indicating the approximate location of Building T (ATEC)."
   },
   {

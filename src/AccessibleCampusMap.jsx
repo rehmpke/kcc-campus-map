@@ -15,6 +15,7 @@ import PopupResources from "./components/PopupResources";
 
 const IMG_SRC = "/maps/kcc-campus.png";
 const isEdit = new URLSearchParams(window.location.search).has("edit");
+const DEFAULT_VISIBLE_RESULTS = 8;
 
 function useImageDimensions(src) {
   const [dims, setDims] = useState(null);
@@ -29,6 +30,94 @@ function useImageDimensions(src) {
   return dims;
 }
 
+function scoreFeature(feature, query) {
+  const q = query.toLowerCase();
+  const name = (feature?.name || "").toLowerCase();
+  const desc = (feature?.desc || "").toLowerCase();
+  const category = (feature?.category || "").toLowerCase();
+  const glyph = (feature?.glyph || "").toLowerCase();
+
+  const links = Array.isArray(feature?.resources?.links)
+    ? feature.resources.links
+    : [];
+
+  const notes = Array.isArray(feature?.resources?.notes)
+    ? feature.resources.notes
+    : [];
+
+  if (!q) return null;
+
+  if (name === q) {
+    return { score: 100, matchReason: "Matched on building name" };
+  }
+
+  if (name.startsWith(q)) {
+    return { score: 90, matchReason: "Matched on building name" };
+  }
+
+  if (name.includes(q)) {
+    return { score: 80, matchReason: "Matched on building name" };
+  }
+
+  for (const link of links) {
+    const label = (link?.label || "").toLowerCase();
+    if (label === q) {
+      return {
+        score: 75,
+        matchReason: `Matched on destination: ${link.label}`,
+      };
+    }
+    if (label.startsWith(q)) {
+      return {
+        score: 72,
+        matchReason: `Matched on destination: ${link.label}`,
+      };
+    }
+    if (label.includes(q)) {
+      return {
+        score: 70,
+        matchReason: `Matched on destination: ${link.label}`,
+      };
+    }
+  }
+
+  if (desc.startsWith(q)) {
+    return { score: 62, matchReason: "Matched on description" };
+  }
+
+  if (desc.includes(q)) {
+    return { score: 60, matchReason: "Matched on description" };
+  }
+
+  for (const note of notes) {
+    const noteText = (note || "").toLowerCase();
+
+    if (noteText.startsWith(q)) {
+      return {
+        score: 52,
+        matchReason: `Matched on note: ${note}`,
+      };
+    }
+
+    if (noteText.includes(q)) {
+      return {
+        score: 50,
+        matchReason: `Matched on note: ${note}`,
+      };
+    }
+  }
+
+  if (category.includes(q)) {
+    return { score: 30, matchReason: "Matched on category" };
+  }
+
+  if (glyph.includes(q)) {
+    return { score: 20, matchReason: "Matched on marker glyph" };
+  }
+
+  return null;
+}
+
 export default function AccessibleCampusMap() {
   const dims = useImageDimensions(IMG_SRC);
   const [features, setFeatures] = useState(INITIAL_FEATURES);
@@ -37,15 +126,42 @@ export default function AccessibleCampusMap() {
   const [selected, setSelected] = useState(null);
   const [directoryAction, setDirectoryAction] = useState(null);
   const [openSections, setOpenSections] = useState(["buildings"]);
+  const [showAllSearchResults, setShowAllSearchResults] = useState(false);
 
-  const filtered = useMemo(() => {
-    const q = filter.trim().toLowerCase();
-    if (!q) return features;
+  const trimmedFilter = filter.trim().toLowerCase();
 
-    return features.filter((f) =>
-      `${f.name} ${f.category} ${f.desc || ""}`.toLowerCase().includes(q)
-    );
-  }, [features, filter]);
+  const rankedSearchResults = useMemo(() => {
+    if (!trimmedFilter) return [];
+
+    return features
+      .map((feature) => {
+        const match = scoreFeature(feature, trimmedFilter);
+        if (!match) return null;
+
+        return {
+          ...feature,
+          searchScore: match.score,
+          matchReason: match.matchReason,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (b.searchScore !== a.searchScore) {
+          return b.searchScore - a.searchScore;
+        }
+        return (a.name || "").localeCompare(b.name || "");
+      });
+  }, [features, trimmedFilter]);
+
+  const visibleSearchResults = useMemo(() => {
+    if (showAllSearchResults) return rankedSearchResults;
+    return rankedSearchResults.slice(0, DEFAULT_VISIBLE_RESULTS);
+  }, [rankedSearchResults, showAllSearchResults]);
+
+  const filteredDirectoryItems = useMemo(() => {
+    if (!trimmedFilter) return features;
+    return rankedSearchResults;
+  }, [features, rankedSearchResults, trimmedFilter]);
 
   const bounds = useMemo(() => {
     if (!dims) return null;
@@ -66,6 +182,20 @@ export default function AccessibleCampusMap() {
   useEffect(() => {
     if (dims && shellRef.current) shellRef.current.focus();
   }, [dims]);
+
+  useEffect(() => {
+    setShowAllSearchResults(false);
+  }, [trimmedFilter]);
+
+  useEffect(() => {
+    if (!trimmedFilter) return;
+
+    setAnnounce(
+      `${rankedSearchResults.length} ranked result${
+        rankedSearchResults.length === 1 ? "" : "s"
+      } found for ${filter.trim()}`
+    );
+  }, [trimmedFilter, rankedSearchResults.length, filter]);
 
   const dropPoint = () => {
     if (!dims) return;
@@ -143,9 +273,13 @@ export default function AccessibleCampusMap() {
     );
   };
 
-  const onSelectList = (f) => {
+  const focusFeatureOnMap = (f, source = "directory") => {
     setSelected(f.id);
-    setAnnounce(`Moved to ${f.name}`);
+    setAnnounce(
+      source === "search"
+        ? `Search result selected: ${f.name}`
+        : `Moved to ${f.name}`
+    );
     focusShell();
 
     if (!f.xy) return;
@@ -155,6 +289,20 @@ export default function AccessibleCampusMap() {
       xy: f.xy,
       nonce: Date.now(),
     });
+  };
+
+  const onSelectList = (f) => {
+    focusFeatureOnMap(f, "directory");
+  };
+
+  const onSelectSearchResult = (f) => {
+    focusFeatureOnMap(f, "search");
+  };
+
+  const clearSearch = () => {
+    setFilter("");
+    setShowAllSearchResults(false);
+    setAnnounce("Search cleared");
   };
 
   const handleFieldChange = (id, field, value) => {
@@ -270,6 +418,17 @@ export default function AccessibleCampusMap() {
             onExport={exportJson}
             onDownloadCSV={downloadCSV}
             onImportClick={triggerImport}
+            onClearSearch={clearSearch}
+            hasActiveSearch={Boolean(trimmedFilter)}
+            searchResults={visibleSearchResults}
+            totalSearchResults={rankedSearchResults.length}
+            canShowMore={
+              rankedSearchResults.length > DEFAULT_VISIBLE_RESULTS &&
+              !showAllSearchResults
+            }
+            onShowAllResults={() => setShowAllSearchResults(true)}
+            selected={selected}
+            onSelectSearchResult={onSelectSearchResult}
           />
 
           <label htmlFor="map-import" className="sr-only">
@@ -287,10 +446,10 @@ export default function AccessibleCampusMap() {
             aria-label="Import CSV of map points"
           />
 
-         {isEdit && (
-          <div className="modeTag">
-            Editor mode – unsaved changes; use Export JSON to persist
-          </div>
+          {isEdit && (
+            <div className="modeTag">
+              Editor mode – unsaved changes; use Export JSON to persist
+            </div>
           )}
 
           <div
@@ -406,27 +565,42 @@ export default function AccessibleCampusMap() {
         <div id="directory" className="side">
           <h2 className="h2">Directory</h2>
 
+          {trimmedFilter ? (
+            <div className="searchDirectoryState" aria-live="polite">
+              Showing directory highlights for search results.
+            </div>
+          ) : null}
+
           <div
             className="accordion"
             role="navigation"
             aria-label="Campus locations directory"
           >
             {DIRECTORY_SECTIONS.map((section) => {
-              const items = filtered.filter((f) =>
+              const items = filteredDirectoryItems.filter((f) =>
                 section.categories.includes(f.category)
               );
-              const isOpen = openSections.includes(section.id);
+
+              const isOpen = trimmedFilter
+                ? items.length > 0
+                : openSections.includes(section.id);
 
               return (
                 <div key={section.id}>
                   <button
                     className="accordionHeader"
-                    onClick={() => toggleSection(section.id)}
+                    onClick={() => {
+                      if (!trimmedFilter) toggleSection(section.id);
+                    }}
                     aria-expanded={isOpen}
                     aria-controls={`section-${section.id}`}
+                    aria-disabled={trimmedFilter ? "true" : undefined}
+                    type="button"
                   >
                     <span>{section.label}</span>
-                    <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+                    <span aria-hidden="true">
+                      {trimmedFilter ? (items.length ? "•" : "") : isOpen ? "−" : "+"}
+                    </span>
                   </button>
 
                   <div
@@ -448,6 +622,7 @@ export default function AccessibleCampusMap() {
                                 }
                               }}
                               aria-label={`Focus ${f.name} on map`}
+                              type="button"
                             >
                               <div className="listName">{f.name}</div>
                               <div className="listCat">{f.category || "location"}</div>
@@ -477,10 +652,11 @@ export default function AccessibleCampusMap() {
           <div className="altText">
             <p className="bold">Text alternative (WCAG):</p>
             <p>
-              Use the directory accordion to focus items on the map. All buildings and
-              landmarks are listed under their categories with names and descriptions.
-              Keyboard: Tab/Shift+Tab to move through sections and items; Enter to
-              expand a section or move the map to the selected item.
+              Use search to directly find destinations and services, or use the
+              directory accordion to browse locations by category. All buildings
+              and landmarks are listed with names and descriptions. Keyboard:
+              Tab/Shift+Tab to move through search, sections, and items; Enter
+              to move the map to the selected item and open its popup.
             </p>
           </div>
         </div>
