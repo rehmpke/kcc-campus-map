@@ -75,7 +75,7 @@ export const INITIAL_FEATURES = [
     "desc": "Gymnasium and student activities center. Accessible restrooms at north entrance.",
     "category": "building",
     "url": "/facilities/activities-center",
-    "img": "/images/map/building-g.jpg",
+    "img": "https://www.kcc.edu/about/uploads/atec.jpg",
     "imgAlt": "Building G entry facing Parking Lot 5",
     "resources": {
       "heading": "Available Services & Resources",
