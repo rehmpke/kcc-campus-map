@@ -33,6 +33,11 @@ export default function Controls({
               id="map-search"
               type="text"
               value={filter}
+              onFocus={() => {
+                if (!isSearchResultsOpen && selectedSearchResult) {
+                  onClearSearch();
+                }
+              }}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Search buildings, services, destinations…"
               autoComplete="off"
