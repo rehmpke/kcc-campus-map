@@ -590,6 +590,10 @@ export default function AccessibleCampusMap() {
                         if (openPopupIdRef.current === f.id) {
                           openPopupIdRef.current = null;
                         }
+
+                        setSelected((prevSelected) =>
+                          prevSelected === f.id ? null : prevSelected
+                        );
                       },
                     }}
                     title={f.name}
