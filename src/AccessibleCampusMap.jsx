@@ -206,6 +206,11 @@ export default function AccessibleCampusMap() {
     );
   }, [rankedSearchResults, features, selectedSearchResultId]);
 
+    const selectedFeature = useMemo(() => {
+    if (!selected) return null;
+    return features.find((item) => item.id === selected) || null;
+  }, [features, selected]);
+
   const bounds = useMemo(() => {
     if (!dims) return null;
 
@@ -510,7 +515,7 @@ export default function AccessibleCampusMap() {
             onClearSearch={clearSearch}
             hasActiveSearch={Boolean(trimmedFilter)}
             isSearchResultsOpen={isSearchResultsOpen}
-            selectedSearchResult={selectedSearchResult}
+            selectedSearchResult={selectedFeature || selectedSearchResult}
             searchResults={visibleSearchResults}
             totalSearchResults={rankedSearchResults.length}
             canShowMore={
