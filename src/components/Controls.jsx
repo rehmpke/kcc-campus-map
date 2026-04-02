@@ -34,14 +34,15 @@ export default function Controls({
               type="text"
               value={filter}
               onFocus={() => {
-                if (!isSearchResultsOpen && selectedSearchResult) {
-                  onClearSearch();
+                if (!isSearchResultsOpen && filter) {
+                  setFilter("");
                 }
               }}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Search buildings, services, destinations…"
               autoComplete="off"
             />
+
             {hasActiveSearch && (
               <button
                 type="button"
@@ -102,7 +103,7 @@ export default function Controls({
             </div>
           )}
 
-          {hasActiveSearch && !isSearchResultsOpen && selectedSearchResult && (
+          {!isSearchResultsOpen && selectedSearchResult && (
             <div className="searchSelectionSummary" role="status" aria-live="polite">
               Showing <strong>{selectedSearchResult.name}</strong> on the map
             </div>

@@ -71,18 +71,21 @@ function scoreFeature(feature, query) {
 
   for (const link of links) {
     const label = (link?.label || "").toLowerCase();
+
     if (label === q) {
       return {
         score: 75,
         matchReason: `Matched on destination: ${link.label}`,
       };
     }
+
     if (label.startsWith(q)) {
       return {
         score: 72,
         matchReason: `Matched on destination: ${link.label}`,
       };
     }
+
     if (label.includes(q)) {
       return {
         score: 70,
@@ -178,6 +181,7 @@ export default function AccessibleCampusMap() {
         if (b.searchScore !== a.searchScore) {
           return b.searchScore - a.searchScore;
         }
+
         return (a.name || "").localeCompare(b.name || "");
       });
   }, [features, trimmedFilter]);
@@ -194,6 +198,7 @@ export default function AccessibleCampusMap() {
 
   const selectedSearchResult = useMemo(() => {
     if (!selectedSearchResultId) return null;
+
     return (
       rankedSearchResults.find((item) => item.id === selectedSearchResultId) ||
       features.find((item) => item.id === selectedSearchResultId) ||
@@ -203,6 +208,7 @@ export default function AccessibleCampusMap() {
 
   const bounds = useMemo(() => {
     if (!dims) return null;
+
     return [
       [0, 0],
       [dims.height, dims.width],
@@ -227,7 +233,6 @@ export default function AccessibleCampusMap() {
 
     if (!trimmedFilter) {
       setIsSearchResultsOpen(false);
-      setSelectedSearchResultId(null);
       return;
     }
 
@@ -337,7 +342,7 @@ export default function AccessibleCampusMap() {
       pendingFocusIdRef.current = f.id;
     }
 
-    if (trimmedFilter) {
+    if (source === "search" || selectedSearchResultId !== null) {
       setSelectedSearchResultId(f.id);
     }
 
@@ -390,6 +395,7 @@ export default function AccessibleCampusMap() {
 
   const handleFieldChange = (id, field, value) => {
     if (!isEdit) return;
+
     setFeatures((prev) =>
       prev.map((f) => (f.id === id ? { ...f, [field]: value } : f))
     );
@@ -601,6 +607,10 @@ export default function AccessibleCampusMap() {
 
                         setSelected((prevSelected) =>
                           prevSelected === f.id ? null : prevSelected
+                        );
+
+                        setSelectedSearchResultId((prevId) =>
+                          prevId === f.id ? null : prevId
                         );
                       },
                     }}
