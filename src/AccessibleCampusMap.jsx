@@ -206,10 +206,20 @@ export default function AccessibleCampusMap() {
     );
   }, [rankedSearchResults, features, selectedSearchResultId]);
 
-    const selectedFeature = useMemo(() => {
+  const selectedFeature = useMemo(() => {
     if (!selected) return null;
     return features.find((item) => item.id === selected) || null;
   }, [features, selected]);
+
+  const visibleDirectorySections = useMemo(() => {
+    if (isEdit) return DIRECTORY_SECTIONS;
+
+    return DIRECTORY_SECTIONS.filter((section) =>
+      filteredDirectoryItems.some((feature) =>
+        section.categories.includes(feature.category)
+      )
+    );
+  }, [filteredDirectoryItems]);
 
   const bounds = useMemo(() => {
     if (!dims) return null;
@@ -340,28 +350,28 @@ export default function AccessibleCampusMap() {
     );
   };
 
-const focusFeatureOnMap = (f, source = "directory") => {
-  setSelected(f.id);
+  const focusFeatureOnMap = (f, source = "directory") => {
+    setSelected(f.id);
 
-  if (source === "marker") {
-    pendingFocusIdRef.current = f.id;
-  }
+    if (source === "marker") {
+      pendingFocusIdRef.current = f.id;
+    }
 
-  if (source === "search" || selectedSearchResultId !== null) {
-    setSelectedSearchResultId(f.id);
-  }
+    if (source === "search" || selectedSearchResultId !== null) {
+      setSelectedSearchResultId(f.id);
+    }
 
-  if (source === "search" || isSearchResultsOpen) {
-    setIsSearchResultsOpen(false);
-  }
+    if (source === "search" || isSearchResultsOpen) {
+      setIsSearchResultsOpen(false);
+    }
 
-  setAnnounce(
-    source === "search"
-      ? `Showing ${f.name} on map`
-      : source === "marker"
-        ? `Focused ${f.name}`
-        : `Moved to ${f.name}`
-  );
+    setAnnounce(
+      source === "search"
+        ? `Showing ${f.name} on map`
+        : source === "marker"
+          ? `Focused ${f.name}`
+          : `Moved to ${f.name}`
+    );
 
     focusShell();
 
@@ -685,7 +695,7 @@ const focusFeatureOnMap = (f, source = "directory") => {
             role="navigation"
             aria-label="Campus locations directory"
           >
-            {DIRECTORY_SECTIONS.map((section) => {
+            {visibleDirectorySections.map((section) => {
               const items = filteredDirectoryItems.filter((f) =>
                 section.categories.includes(f.category)
               );
