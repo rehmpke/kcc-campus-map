@@ -1,40 +1,42 @@
-# 🗺️ KCC Campus Map (Accessible Interactive Map)
+# 🗺️ KCC Campus Map (Accessible Interactive Wayfinding)
 
-An accessible, WCAG 2.1 AA–compliant interactive campus map for Kankakee Community College built with **React**, **Vite**, **Leaflet**, and **React-Leaflet**.
+An accessible, WCAG 2.1 AA–aligned interactive campus map for **Kankakee Community College** built with **React, Vite, Leaflet, and React-Leaflet**.
 
-This project replaces the legacy static PDF campus map with an interactive, keyboard-operable, screen-reader-friendly campus navigation experience. It is designed as a **public-facing accessibility bridge solution** that supports the DOJ ADA WCAG 2.1 AA compliance timeline and remains intentionally separate from the College’s longer-term enterprise wayfinding initiative.
+This project replaces legacy static PDF campus maps with a **public-facing, keyboard-operable, screen-reader-friendly wayfinding experience**.
+
+It is intentionally designed as a **bridge solution for DOJ ADA Title II WCAG 2.1 AA compliance readiness ahead of April 24, 2026**, and is **separate from the College’s longer-term enterprise wayfinding initiative**.
 
 ---
 
-## 🎯 Project Purpose
+# 🎯 Project Purpose
 
-This map is designed to support:
+The map is designed for **public destination discovery and accessible arrival support**, not facilities inventory replication.
 
-- public-facing campus navigation
+## Primary goals
+
 - accessible building discovery
 - parking and entrance wayfinding
 - student services discovery
-- destination-first search
-- campus-specific accessibility needs
-- text alternatives for all mapped locations
-- public bridge wayfinding before enterprise campus wayfinding matures
+- landmark and destination search
+- campus-specific accessibility guidance
+- text alternatives for all mapped destinations
+- public bridge wayfinding across KCC campuses
 
-This project is **not intended to recreate every room number, office, or internal facilities inventory reference** from the legacy PDF maps.
+## Explicitly out of scope
 
-The focus is:
+This project is **not intended to recreate**:
 
-- buildings
-- parking
-- accessible entrances
-- landmarks
-- safety and emergency locations
-- student-facing destinations
-- service locations
-- accessible arrival instructions
+- every classroom
+- internal room inventories
+- closet / facilities references
+- maintenance-only locations
+- long-term enterprise indoor navigation
+
+The product direction is **destination-first public wayfinding**.
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
 - **React 19**
 - **Vite**
@@ -42,58 +44,162 @@ The focus is:
 - **React-Leaflet**
 - **Vanilla CSS**
 - **Lucide React**
+- **Framer Motion** (marker polish + animation support)
 
 ---
 
-## 🚀 Current Features
+# 🧱 Architecture
 
-### ✔ Viewer Mode (Default)
+The project is fully modularized and should remain modular.
 
-- Static image-overlay campus map using **Leaflet Simple CRS**
-- Keyboard panning and zoom
-- Accordion directory grouped by category
-- Destination-first ranked search across:
-  - building names
-  - descriptions
-  - popup resource link labels
-  - resource notes
-  - arrival and access guidance
-- Search result selection:
-  - flies to the marker
-  - opens the popup
-  - syncs directory selected state
-  - collapses search results after destination selection
-  - keeps search text visible for orientation
-- Directory click → unified destination focus behavior
-- Marker click uses the same popup focus pipeline
-- Selected marker animation state
-- Accessible popup content with:
-  - title
-  - description
-  - image
-  - **Arrival & Access**
-  - **Available Services & Resources**
-  - footer CTA zone
-- Skip links to map and directory
-- Screen-reader live announcements
-- Mobile and desktop compatible
+## Current major modules
 
-### ✔ Editor Mode (`?edit=true`)
+- `src/AccessibleCampusMap.jsx`
+- `src/components/Controls.jsx`
+- `src/components/DirectoryFlyTo.jsx`
+- `src/components/FeatureEditor.jsx`
+- `src/components/PopupArrival.jsx`
+- `src/components/PopupResources.jsx`
+- `src/components/Announcer.jsx`
+- `src/data/mapData.js`
+- `src/utils/mapIcons.js`
+- `src/utils/mapUtils.js`
+- `src/map.css`
 
-Editor mode supports:
+## Architectural principles
+
+- destination-first interaction model
+- single unified focus/open pipeline
+- modular popup sections
+- data-shaped directory rendering
+- campus image overlay precision via Simple CRS
+- no Tailwind or framework styling abstractions
+- accessibility-first keyboard and text alternatives
+
+---
+
+# 🚀 Current Viewer Experience
+
+## ✔ Map interaction
+
+- static image-overlay map using **Leaflet Simple CRS**
+- pan via drag or keyboard arrows
+- zoom controls and keyboard zoom
+- Home key centers current view
+- End key fits full campus bounds
+- selected marker animation and visual emphasis
+
+## ✔ Unified destination state model
+
+All entry paths now share the same behavior:
+
+- marker click
+- directory click
+- search result selection
+
+Each action synchronizes:
+
+- selected marker visual state
+- popup open state
+- directory highlighted item
+- active destination summary line
+- screen-reader announcement
+- map focus shell
+
+This keeps the interaction model cognitively simple and highly predictable.
+
+## ✔ Destination-first ranked search
+
+The search system now supports a richer wayfinding flow.
+
+### Search matches across
+
+- building names
+- descriptions
+- categories
+- marker glyphs
+- arrival guidance
+- popup service links
+- resource notes
+
+### Search behavior
+
+- destination-ranked best matches
+- compact preview mode
+- expandable **Show all results** state
+- collapses after destination selection
+- preserves selected destination context
+- abandoning search returns to browse mode cleanly
+- directory or marker click clears transient search state
+- active summary line persists until the map context changes
+
+## ✔ Dynamic directory rendering
+
+The directory is now **content-aware**.
+
+### Viewer mode
+
+- only renders accordion sections that contain data
+- hides empty categories automatically
+- keeps browsing concise
+- reduces dead UI regions
+
+This is especially important for:
+
+- future campus-specific datasets
+- reduced cognitive load
+- stronger accessibility scanning
+
+## ✔ Popup content model
+
+Popup structure is now standardized.
+
+### Popup sections
+
+- title
+- optional image
+- description
+- **Arrival & Access**
+- **Available Services & Resources**
+- footer CTA zone
+
+This separation improves:
+
+- readability
+- screen-reader reading order
+- service discoverability
+- future structured editing
+
+---
+
+# ✍️ Editor Mode (`?edit=true`)
+
+Editor mode is designed for safe map refinement without changing source code directly.
+
+## Current capabilities
 
 - add markers
 - drag markers
-- edit marker metadata
+- edit metadata
 - export JSON
 - download CSV
 - import CSV
-- manage popup resources
-- manage arrival and access guidance
+- edit popup images
+- edit glyphs
+- edit arrival guidance
+- edit structured resources
 
-Current editable fields:
+## Editor directory behavior
 
+Unlike viewer mode, editor mode may expose empty categories so future destinations can be added intentionally.
+
+This preserves taxonomy visibility while authoring.
+
+## Current editable fields
+
+- `id`
 - `name`
+- `xy`
 - `desc`
 - `category`
 - `glyph`
@@ -105,59 +211,9 @@ Current editable fields:
 
 ---
 
-## 🧭 Accessibility Support (WCAG 2.1 AA)
+# 📦 Feature Data Model
 
-The map is intentionally built around accessibility-first interaction.
-
-### Keyboard support
-
-| Action | Key |
-|---|---|
-| Pan | Arrow keys |
-| Zoom in | `+` or `=` |
-| Zoom out | `-` |
-| Reset center | `Home` |
-| Fit full map | `End` |
-| Open directory item | `Enter` |
-| Skip to map | Skip link |
-| Skip to directory | Skip link |
-
-### Accessibility patterns implemented
-
-- WCAG 2.1 AA focus states
-- keyboard-operable map region
-- `aria-live` announcements
-- grouped accordion directory as text alternative
-- accessible popup links
-- logical reading order
-- no pointer-only interaction requirements
-- visible focus indicators
-- text-equivalent arrival guidance
-- mobile-safe popup reading flow
-
----
-
-## 🖼️ Map Image Model
-
-The campus map uses a **static high-resolution image overlay**, not GIS coordinates.
-
-```text
-public/maps/kcc-campus.png
-```
-
-All marker coordinates use image pixel positioning:
-
-```js
-xy: [y, x]
-```
-
-This allows precise placement over the designed campus illustration while preserving accessibility and full keyboard control.
-
----
-
-## 📦 Feature Data Model
-
-Each map feature currently supports:
+Each destination supports structured metadata.
 
 ```js
 {
@@ -193,152 +249,104 @@ Each map feature currently supports:
 }
 ```
 
-### Arrival model
-
-Popup arrival content is structured as:
-
-- `arrival.heading`
-- `arrival.parking`
-- `arrival.entrance`
-- `arrival.route`
-- `arrival.elevator`
-- `arrival.restroom`
-
-### Resource model
-
-Popup resource content is structured as:
-
-- `resources.heading`
-- `resources.links[]`
-- `resources.notes[]`
-
-This keeps popup rendering safe, structured, and maintainable.
-
 ---
 
-## 📁 Current File Structure
+# 🖼️ Map Coordinate Model
 
-The project is now fully modularized and should **not be collapsed back into a single-file implementation**.
+The map uses a **static high-resolution image overlay**, not GIS coordinates.
 
 ```text
-src/
-  App.jsx
-  AccessibleCampusMap.jsx
-  map.css
-  data/
-    mapData.js
-  utils/
-    mapIcons.js
-    mapUtils.js
-  components/
-    Announcer.jsx
-    Controls.jsx
-    DirectoryFlyTo.jsx
-    FeatureEditor.jsx
-    PopupArrival.jsx
-    PopupResources.jsx
+public/maps/kcc-campus.png
 ```
 
-### Ownership model
+All coordinates use image pixel positioning:
 
-- `AccessibleCampusMap.jsx` → orchestration + state + selection flow
-- `data/` → seed map datasets + directory sections
-- `utils/` → icons, CSV, parsing helpers
-- `components/Controls.jsx` → search + admin controls
-- `components/DirectoryFlyTo.jsx` → viewport + popup sync
-- `components/PopupArrival.jsx` → arrival guidance rendering
-- `components/PopupResources.jsx` → services/resources rendering
-- `components/FeatureEditor.jsx` → editor mode metadata updates
+```js
+xy: [y, x]
+```
 
-This structure reduces regression risk as:
-- popup logic evolves
-- search ranking improves
-- multiple campus datasets are added
-- editor workflows mature
+This allows:
+
+- exact placement over designed campus artwork
+- predictable popup positioning
+- easier multi-campus portability
+- strong keyboard control compatibility
 
 ---
 
-## 💾 CSV Import / Export
+# 🧭 Accessibility Model (WCAG 2.1 AA)
 
-Supported CSV fields:
+Accessibility is a first-order architecture decision.
 
-| Column | Description |
+## Keyboard support
+
+| Action | Key |
 |---|---|
-| `id` | Unique identifier |
-| `name` | Building or destination |
-| `category` | building, parking, entrance, landmark, service |
-| `desc` | Accessible description |
-| `y` / `x` | Image pixel coordinates |
-| `url` | Optional detail page |
-| `img` | Optional image |
-| `imgAlt` | Required if image is present |
-| `glyph` | Marker badge text |
-| `arrivalJson` | Structured arrival object |
-| `resourcesJson` | Structured resource object |
+| Pan | Arrow keys |
+| Zoom in | `+` or `=` |
+| Zoom out | `-` |
+| Center current context | `Home` |
+| Fit campus bounds | `End` |
+| Open directory item | `Enter` |
+| Skip to map | Skip link |
+| Skip to directory | Skip link |
 
-CSV import replaces the active in-memory dataset.
+## Accessibility patterns implemented
 
-JSON export remains the source of truth for persisting production-ready seed data.
-
----
-
-## 🛠️ Development
-
-### Install
-
-```bash
-npm install
-```
-
-### Run local development
-
-```bash
-npm run dev
-```
-
-### Production build
-
-```bash
-npm run build
-```
-
-Deploy the `dist/` folder to any static host:
-
-- CloudCannon
-- AWS S3 / CloudFront
-- institutional web infrastructure
-- other static hosting environments
+- WCAG 2.1 AA visible focus states
+- keyboard-operable map shell
+- skip links to map and directory
+- `aria-live` announcements
+- grouped directory as text alternative
+- structured popup reading order
+- text-equivalent arrival guidance
+- no pointer-only dependency
+- active destination breadcrumb summary
+- reduced empty UI in browse mode
+- mobile-safe popup reading flow
 
 ---
 
-## 🗺️ Current Refinement Roadmap
+# 🗺️ Product Direction
 
-### Near-term
+## Current refinement priorities
 
-- standardize arrival/access data for major public buildings
-- replace raw resources JSON textarea with structured add/remove UI
-- add structured arrival editing in editor mode
-- support multiple campus datasets:
+- standardize arrival/access data for key public buildings
+- continue popup spacing and visual rhythm polish
+- expand structured editor support
+- support multiple campus datasets
   - Main
   - Riverfront
   - SEC
   - MITC
-- continue popup rhythm and spacing polish
-- enrich destination-level service metadata
-
-### Mid-term
-
-- campus switcher
-- campus-aware search
-- service category enrichment
-- analytics for most-used destinations
-- CMS-connected dataset workflows
-- public event and seasonal routing overlays
+- continue destination-first search simplification
+- clean parking and entrance data quality
 
 ---
 
-## 👤 Project Owner
+# 📌 Product Positioning
 
-**Roger J. Ehmpke**  
-Director of Web Strategy and Digital Experience  
-Kankakee Community College
+Compared with many higher-ed map experiences, this implementation prioritizes:
+
+- lower cognitive load
+- fewer control metaphors
+- stronger keyboard parity
+- simpler public-facing wayfinding
+- faster destination acquisition
+- better text alternative coverage
+
+The result is intentionally optimized for **public accessibility, compliance, and cognitive simplicity over GIS-style control complexity**.
+
+---
+
+# ✅ Non-Negotiables
+
+- WCAG 2.1 AA compliance
+- unified popup behavior
+- selected marker + directory sync
+- popup section separation
+- dynamic viewer directory sections
+- editor taxonomy visibility
+- no Tailwind
+- preserve working features unless intentionally redesigning
+
