@@ -157,6 +157,7 @@ export default function AccessibleCampusMap() {
   const [selectedSearchResultId, setSelectedSearchResultId] = useState(null);
 
   const trimmedFilter = filter.trim().toLowerCase();
+  const isDirectoryInSearchMode = Boolean(trimmedFilter) && isSearchResultsOpen;
 
   const rankedSearchResults = useMemo(() => {
     if (!trimmedFilter) return [];
@@ -187,9 +188,9 @@ export default function AccessibleCampusMap() {
   }, [rankedSearchResults, showAllSearchResults]);
 
   const filteredDirectoryItems = useMemo(() => {
-    if (!trimmedFilter) return features;
+    if (!isDirectoryInSearchMode) return features;
     return rankedSearchResults;
-  }, [features, rankedSearchResults, trimmedFilter]);
+  }, [features, rankedSearchResults, isDirectoryInSearchMode]);
 
   const selectedSearchResult = useMemo(() => {
     if (!selectedSearchResultId) return null;
@@ -667,7 +668,7 @@ export default function AccessibleCampusMap() {
                 section.categories.includes(f.category)
               );
 
-              const isOpen = trimmedFilter
+              const isOpen = isDirectoryInSearchMode
                 ? items.length > 0
                 : openSections.includes(section.id);
 
@@ -676,16 +677,16 @@ export default function AccessibleCampusMap() {
                   <button
                     className="accordionHeader"
                     onClick={() => {
-                      if (!trimmedFilter) toggleSection(section.id);
+                      if (!isDirectoryInSearchMode) toggleSection(section.id);
                     }}
                     aria-expanded={isOpen}
                     aria-controls={`section-${section.id}`}
-                    aria-disabled={trimmedFilter ? "true" : undefined}
+                    aria-disabled={isDirectoryInSearchMode ? "true" : undefined}
                     type="button"
                   >
                     <span>{section.label}</span>
                     <span aria-hidden="true">
-                      {trimmedFilter ? (items.length ? "•" : "") : isOpen ? "−" : "+"}
+                      {isDirectoryInSearchMode ? (items.length ? "•" : "") : isOpen ? "−" : "+"}
                     </span>
                   </button>
 
