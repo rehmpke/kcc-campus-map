@@ -31,7 +31,7 @@ export default function Controls({
             <span className="sr-only">Search campus locations</span>
             <input
               id="map-search"
-              type="search"
+              type="text"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Search buildings, services, destinations…"
