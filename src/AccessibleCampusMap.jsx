@@ -194,8 +194,12 @@ export default function AccessibleCampusMap() {
 
   const selectedSearchResult = useMemo(() => {
     if (!selectedSearchResultId) return null;
-    return rankedSearchResults.find((item) => item.id === selectedSearchResultId) || null;
-  }, [rankedSearchResults, selectedSearchResultId]);
+    return (
+      rankedSearchResults.find((item) => item.id === selectedSearchResultId) ||
+      features.find((item) => item.id === selectedSearchResultId) ||
+      null
+    );
+  }, [rankedSearchResults, features, selectedSearchResultId]);
 
   const bounds = useMemo(() => {
     if (!dims) return null;
@@ -333,8 +337,11 @@ export default function AccessibleCampusMap() {
       pendingFocusIdRef.current = f.id;
     }
 
-    if (source === "search") {
+    if (trimmedFilter) {
       setSelectedSearchResultId(f.id);
+    }
+
+    if (source === "search") {
       setIsSearchResultsOpen(false);
     }
 
@@ -686,7 +693,13 @@ export default function AccessibleCampusMap() {
                   >
                     <span>{section.label}</span>
                     <span aria-hidden="true">
-                      {isDirectoryInSearchMode ? (items.length ? "•" : "") : isOpen ? "−" : "+"}
+                      {isDirectoryInSearchMode
+                        ? items.length
+                          ? "•"
+                          : ""
+                        : isOpen
+                          ? "−"
+                          : "+"}
                     </span>
                   </button>
 
