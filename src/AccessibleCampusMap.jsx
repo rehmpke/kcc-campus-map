@@ -340,28 +340,28 @@ export default function AccessibleCampusMap() {
     );
   };
 
-  const focusFeatureOnMap = (f, source = "directory") => {
-    setSelected(f.id);
+const focusFeatureOnMap = (f, source = "directory") => {
+  setSelected(f.id);
 
-    if (source === "marker") {
-      pendingFocusIdRef.current = f.id;
-    }
+  if (source === "marker") {
+    pendingFocusIdRef.current = f.id;
+  }
 
-    if (source === "search" || selectedSearchResultId !== null) {
-      setSelectedSearchResultId(f.id);
-    }
+  if (source === "search" || selectedSearchResultId !== null) {
+    setSelectedSearchResultId(f.id);
+  }
 
-    if (source === "search") {
-      setIsSearchResultsOpen(false);
-    }
+  if (source === "search" || isSearchResultsOpen) {
+    setIsSearchResultsOpen(false);
+  }
 
-    setAnnounce(
-      source === "search"
-        ? `Showing ${f.name} on map`
-        : source === "marker"
-          ? `Focused ${f.name}`
-          : `Moved to ${f.name}`
-    );
+  setAnnounce(
+    source === "search"
+      ? `Showing ${f.name} on map`
+      : source === "marker"
+        ? `Focused ${f.name}`
+        : `Moved to ${f.name}`
+  );
 
     focusShell();
 
