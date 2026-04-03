@@ -6,11 +6,24 @@ export default function PopupArrival({ arrival }) {
   const parking = arrival.parking?.trim();
   const entrance = arrival.entrance?.trim();
   const route = arrival.route?.trim();
+  const elevator = arrival.elevator?.trim();
+  const restroom = arrival.restroom?.trim();
+  const serviceNote = arrival.serviceNote?.trim();
   const access = Array.isArray(arrival.access)
     ? arrival.access.filter(Boolean)
     : [];
 
-  if (!parking && !entrance && !route && !access.length) return null;
+  if (
+    !parking &&
+    !entrance &&
+    !route &&
+    !elevator &&
+    !restroom &&
+    !serviceNote &&
+    !access.length
+  ) {
+    return null;
+  }
 
   return (
     <section className="popupArrival" aria-label={heading}>
@@ -33,6 +46,24 @@ export default function PopupArrival({ arrival }) {
         {route ? (
           <li>
             <span className="popupArrivalLabel">Route:</span> {route}
+          </li>
+        ) : null}
+
+        {elevator ? (
+          <li>
+            <span className="popupArrivalLabel">Elevator:</span> {elevator}
+          </li>
+        ) : null}
+
+        {restroom ? (
+          <li>
+            <span className="popupArrivalLabel">Restroom:</span> {restroom}
+          </li>
+        ) : null}
+
+        {serviceNote ? (
+          <li>
+            <span className="popupArrivalLabel">Visitor guidance:</span> {serviceNote}
           </li>
         ) : null}
 

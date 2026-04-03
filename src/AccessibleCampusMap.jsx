@@ -52,6 +52,7 @@ function scoreFeature(feature, query) {
     feature?.arrival?.route || "",
     feature?.arrival?.elevator || "",
     feature?.arrival?.restroom || "",
+    feature?.arrival?.serviceNote || "",
     ...(Array.isArray(feature?.arrival?.access) ? feature.arrival.access : []),
   ].map((item) => String(item).toLowerCase());
 
@@ -286,6 +287,7 @@ export default function AccessibleCampusMap() {
           route: "",
           elevator: "",
           restroom: "",
+          serviceNote: "",
           access: [],
         },
         resources: {
@@ -453,7 +455,9 @@ export default function AccessibleCampusMap() {
         break;
       case "Home":
         e.preventDefault();
-        map.setView(map.getCenter(), 0);
+        if (dims) {
+          map.setView([dims.height / 2, dims.width / 2], map.getZoom());
+        }
         break;
       case "End":
         e.preventDefault();
@@ -468,7 +472,7 @@ export default function AccessibleCampusMap() {
     const listener = (e) => handleKeyNav(e);
     document.addEventListener("keydown", listener);
     return () => document.removeEventListener("keydown", listener);
-  }, [bounds]);
+  }, [bounds, dims]);
 
   const toggleSection = (id) => {
     setOpenSections((prev) =>
@@ -575,10 +579,11 @@ export default function AccessibleCampusMap() {
                   mapRef.current = m;
                 }}
                 crs={L.CRS.Simple}
-                bounds={bounds}
+                center={[dims.height / 2, dims.width / 2]}
+                zoom={-0.5}
                 maxBounds={bounds}
                 maxZoom={3}
-                minZoom={-4}
+                minZoom={-2.5}
                 zoomSnap={0.25}
                 wheelPxPerZoomLevel={120}
                 style={{ height: "70vh", width: "100%" }}

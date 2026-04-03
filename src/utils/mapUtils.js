@@ -1,5 +1,18 @@
 // src/utils/mapUtils.js
 
+export function safeParseArrivalJson(value) {
+  if (!value) return undefined;
+
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+}
+
 export function safeParseResourcesJson(value) {
   if (!value) return undefined;
 
@@ -25,6 +38,7 @@ export function featuresToCSV(rows) {
     "img",
     "imgAlt",
     "glyph",
+    "arrivalJson",
     "resourcesJson",
   ];
 
@@ -39,6 +53,7 @@ export function featuresToCSV(rows) {
     r.img || "",
     r.imgAlt || "",
     r.glyph || "",
+    r.arrival ? JSON.stringify(r.arrival) : "",
     r.resources ? JSON.stringify(r.resources) : "",
   ]);
 
@@ -65,6 +80,7 @@ export function parseCSV(text, dims) {
     img: header.indexOf("img"),
     imgAlt: header.indexOf("imgalt"),
     glyph: header.indexOf("glyph"),
+    arrivalJson: header.indexOf("arrivaljson"),
     resourcesJson: header.indexOf("resourcesjson"),
   };
 
@@ -90,11 +106,27 @@ export function parseCSV(text, dims) {
     const img = idx.img >= 0 ? cols[idx.img] : "";
     const imgAlt = idx.imgAlt >= 0 ? cols[idx.imgAlt] : "";
     const glyph = idx.glyph >= 0 ? cols[idx.glyph] : "";
+    const arrival =
+      idx.arrivalJson >= 0
+        ? safeParseArrivalJson(cols[idx.arrivalJson])
+        : undefined;
     const resources =
       idx.resourcesJson >= 0
         ? safeParseResourcesJson(cols[idx.resourcesJson])
         : undefined;
 
-    return { id, name, category, desc, xy, url, img, imgAlt, glyph, resources };
+    return {
+      id,
+      name,
+      category,
+      desc,
+      xy,
+      url,
+      img,
+      imgAlt,
+      glyph,
+      arrival,
+      resources,
+    };
   });
 }
